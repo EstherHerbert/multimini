@@ -11,3 +11,4 @@ LazyData: true
 RoxygenNote: 7.2.1
 Imports: 
     magrittr
+License: MIT + file LICENSE
