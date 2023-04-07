@@ -18,7 +18,7 @@ balance <- function(object) {
 
   imbalance <- rep(NA, length(factors))
   for(i in 1:length(factors)) {
-    imbalance[i] <- sum(apply(tab[[i]], 2, sd))
+    imbalance[i] <- sum(apply(tab[[i]], 2, stats::sd))
   }
   imbalance <- sum(imbalance)
 

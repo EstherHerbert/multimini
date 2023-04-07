@@ -34,7 +34,7 @@ minimise <- function(data, groups = 3, factors, burnin = 10,
   for(i in (burnin + 1):sampsize){
 
     c_factors <- out[i,] # new participant
-    p_factors <- head(out, i-1) # previous participants
+    p_factors <- utils::head(out, i-1) # previous participants
 
     counts <- matrix(NA, groups, n.factors)
     for (j in 1:groups) {
@@ -53,13 +53,13 @@ minimise <- function(data, groups = 3, factors, burnin = 10,
 
     SD <- matrix(NA, groups, n.factors)
     for(j in 1:groups){
-      SD[j,] <- apply(scenarios[[j]], 2, sd)
+      SD[j,] <- apply(scenarios[[j]], 2, stats::sd)
     }; rm(j)
 
     scores <- apply(SD, 1, sum) # sum across SDs for each scenario
 
 
-    if (var(scores) == 0) { # i.e., if they're all equal
+    if (stats::var(scores) == 0) { # i.e., if they're all equal
       probs <- rep(1/groups, groups)
     } else {
       probs <- minprob[rank(scores)]
