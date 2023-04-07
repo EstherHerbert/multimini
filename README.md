@@ -23,10 +23,14 @@ This is a basic example which shows you how to solve a common problem:
 
 ``` r
 library(multimini)
+
 patients <- data.frame(sex = sample(c("M", "F"), 150, replace = T),
                        stage = sample(c("I", "II", "III"), 150, replace = T,
                                       prob = c(0.5, 0.3, 0.2)),
                        site = sample(1:10, 150, replace = T))
-minimise(patients, groups = 4, factors = c("sex", "site"), burnin = 15)
+                       
+(mini <- minimise(patients, groups = 3, factors = c("sex", "site"), burnin = 15))
+
+balance(mini)
 ```
 
