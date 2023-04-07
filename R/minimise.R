@@ -69,12 +69,13 @@ minimise <- function(data, groups = 3, factors, burnin = 10,
 
   }
 
-  mini <- list(data = out, groups = groups, factors = factors, burnin = burnin,
-               minprob = minprob)
+  class(out) <- c("mini", "data.frame")
+  groups(out) <- groups
+  factors(out) <- factors
+  burnin(out) <- burnin
+  minprob(out) <- minprob
 
-  class(mini) <- "mini"
-
-  return(mini)
+  return(out)
 
 }
 
@@ -83,12 +84,12 @@ print.mini <- function(x, ...){
 
   cat("Multi-arm Minimisation \n")
   cat(rep("-", 80), "\n", sep = "")
-  cat("Number of groups:", x$groups, "\n")
-  cat("Factors:", paste(x$factors, collapse = ", "), "\n")
-  cat("Burnin:", x$burnin, "\n")
+  cat("Number of groups:", groups(x), "\n")
+  cat("Factors:", paste(factors(x), collapse = ", "), "\n")
+  cat("Burnin:", burnin(x), "\n")
   cat("Minimisation probabilities:",
-      paste(round(x$minprob, 2), collapse = ", "), "\n")
-  cat("Group sizes:", paste(table(x$data$Group), collapse = ", "))
+      paste(round(minprob(x), 2), collapse = ", "), "\n")
+  cat("Group sizes:", paste(table(x$Group), collapse = ", "))
 
   return(invisible(x))
 

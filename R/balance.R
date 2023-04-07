@@ -9,10 +9,10 @@
 #' @export
 balance <- function(object) {
 
-  factors <- object$factors
+  factors <- factors(object)
   tab <- list()
   for(i in 1:length(factors)) {
-    tab[[i]] <- table(object$data[,c("Group", factors[i])])
+    tab[[i]] <- table(object[,c("Group", factors[i])])
     names(tab)[i] <- factors[i]
   }
 
@@ -22,7 +22,8 @@ balance <- function(object) {
   }
   imbalance <- sum(imbalance)
 
-  out <- list(balance = tab, imbalance = imbalance)
+  out <- list(balance = tab, imbalance = imbalance, groups = groups(object),
+              factors = factors)
   class(out) <- "balance.mini"
 
   return(out)
@@ -37,7 +38,8 @@ print.balance.mini <- function(x, ...) {
     temp[[i]] <- knitr::kable(x$balance[[i]],
                               format = "markdown")
   }
-  cat("Balance\n")
+  cat("Balance of factors (", paste(x$factors, collapse = ", "), ") over",
+      x$groups, "groups\n")
   cat(rep("-", 80), "\n", sep = "")
   cat(do.call("paste", c(temp, sep = "    ")), sep = "\n")
   cat("\nTotal imbalance:", round(x$imbalance, 3))
