@@ -33,3 +33,12 @@ minprob <- function(x) {
   attr(x, "minprob") <- value
   return(x)
 }
+
+strata <- function(x) {
+  return(attr(x, "strata"))
+}
+
+`strata<-` <- function(x, value) {
+  attr(x, "strata") <- value
+  return(x)
+}

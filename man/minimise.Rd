@@ -9,7 +9,8 @@ minimise(
   groups = 3,
   factors,
   burnin = 10,
-  minprob = c(0.8, rep(0.2/(groups - 1), groups - 1))
+  minprob = c(0.8, rep(0.2/(groups - 1), groups - 1)),
+  stratify = NULL
 )
 }
 \arguments{
@@ -27,6 +28,10 @@ default is 10}
 probabilities. The default is to give 0.8 probability to the
 group which would lead to the least imbalance and to allocate
 the remaining probability equally to the other groups.}
+
+\item{stratify}{if stratification is to be used then a character string
+specifying the name of the stratification variable (e.g.,
+"site"). Default is `NULL` for no stratification.}
 }
 \value{
 (Invisibly) the data.frame with an additional column `Group` indicating
