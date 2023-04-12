@@ -7,7 +7,8 @@
 #' @param groups an integer, the number of groups to randomise to, default is 3
 #' @param factors a character vector with the factors for minimisation
 #' @param burnin an integer, the burnin length before minimisation kicks in,
-#'               default is 10
+#'               default is 10. When using stratification burnin must be smaller
+#'               than the smallest strata size.
 #' @param minprob a vector of the same length as `groups` with the minimisation
 #'                probabilities. The default is to give 0.8 probability to the
 #'                group which would lead to the least imbalance and to allocate
@@ -40,6 +41,9 @@ minimise <- function(data, groups = 3, factors, burnin = 10,
   for(s in 1:length(out)) {
     sampsize <- nrow(out[[s]])
     # Burn-in phase
+    if(burnin >= sampsize)
+      stop(paste0("Specified burnin must be less than the smallest strata",
+                  "size (", min(sapply(out, nrow)), ")."))
     out[[s]]$Group[1:burnin] <- sample(1:groups, burnin, replace = T)
 
     # Minimisation
