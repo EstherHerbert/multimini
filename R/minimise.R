@@ -16,6 +16,8 @@
 #' @param stratify if stratification is to be used then a character string
 #'                 specifying the name of the stratification variable (e.g.,
 #'                 "site"). Default is `NULL` for no stratification.
+#' @param ratio a numeric vector of randomisation ratios (must be of length
+#'              equal to the number of groups)
 #'
 #' @returns (Invisibly) the data.frame with an additional column `Group` indicating
 #' numerically which group has been allocated.
@@ -23,7 +25,7 @@
 #' @export
 minimise <- function(data, groups = 3, factors, burnin = 10,
                      minprob = c(0.8, rep(0.2/(groups - 1), groups - 1)),
-                     stratify = NULL){
+                     stratify = NULL, ratio = c(1,1,1)){
 
   sampsize <- nrow(data)
   n.factors <- length(factors)
@@ -52,27 +54,23 @@ minimise <- function(data, groups = 3, factors, burnin = 10,
       c_factors <- out[[s]][i,] # new participant
       p_factors <- utils::head(out[[s]], i-1) # previous participants
 
-      counts <- matrix(NA, groups, n.factors)
-      for (j in 1:groups) {
-        for (k in 1:n.factors) {
-          factor <- factors[k]
+      counts <- matrix(NA, n.factors, groups)
+      for (j in 1:n.factors) {
+        for (k in 1:groups) {
+          factor <- factors[j]
           counts[j,k] <- sum(p_factors[,factor] == c_factors[,factor] &
-                               p_factors$Group == j)
+                               p_factors$Group == k)
         }
       }; rm(j, k)
 
-      scenarios <- list()
-      for(j in 1:groups){
-        scenarios[[j]] <- counts
-        scenarios[[j]][j,] <- counts[j,] + rep(1, n.factors)
-      }; rm(j)
-
-      SD <- matrix(NA, groups, n.factors)
-      for(j in 1:groups){
-        SD[j,] <- apply(scenarios[[j]], 2, stats::sd)
-      }; rm(j)
-
-      scores <- apply(SD, 1, sum) # sum across SDs for each scenario
+      scores <- rep(NA, groups)
+      for (j in 1:groups) {
+        temp <- counts
+        temp[, j] <- temp[, j] + 1
+        num_level <- temp %*% diag(1/ratio)
+        sd_level <- apply(num_level, 1, sd)
+        scores[j] <- sum(sd_level)
+      }
 
 
       if (stats::var(scores) == 0) { # i.e., if they're all equal
