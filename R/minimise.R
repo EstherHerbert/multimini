@@ -105,6 +105,7 @@ print.mini <- function(x, ...){
   cat("Multi-arm Minimisation \n")
   cat(rep("-", 80), "\n", sep = "")
   cat("Number of groups:", groups(x), "\n")
+  cat("Randomisation ratio:", paste(ratio(x), collapse = ":"), "\n")
   cat("Factors:", paste(factors(x), collapse = ", "), "\n")
   if (!is.null(strata(x))) {
     cat("Stratified by:", strata(x), "\n")
