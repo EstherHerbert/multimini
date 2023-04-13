@@ -22,8 +22,9 @@ for the minimisation factors.}
 \item{factors}{a character vector with the factors for minimisation}
 
 \item{burnin}{an integer, the burnin length before minimisation kicks in,
-default is 10. When using stratification burnin must be smaller
-than the smallest strata size.}
+default is 10. Must be >0 and < total sample size. When using
+stratification burnin must be smaller than the smallest strata
+size.}
 
 \item{minprob}{a vector of the same length as `groups` with the minimisation
 probabilities. The default is to give 0.8 probability to the

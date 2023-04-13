@@ -7,8 +7,9 @@
 #' @param groups an integer, the number of groups to randomise to, default is 3
 #' @param factors a character vector with the factors for minimisation
 #' @param burnin an integer, the burnin length before minimisation kicks in,
-#'               default is 10. When using stratification burnin must be smaller
-#'               than the smallest strata size.
+#'               default is 10. Must be >0 and < total sample size. When using
+#'               stratification burnin must be smaller than the smallest strata
+#'               size.
 #' @param minprob a vector of the same length as `groups` with the minimisation
 #'                probabilities. The default is to give 0.8 probability to the
 #'                group which would lead to the least imbalance and to allocate
@@ -24,6 +25,33 @@
 minimise <- function(data, groups = 3, factors, burnin = 10,
                      minprob = c(0.8, rep(0.2/(groups - 1), groups - 1)),
                      stratify = NULL){
+
+  # Check inputs
+  if(groups < 2) {
+    stop("Must be randomising to two or more groups.")
+  }
+
+  if(!all(minprob <= 1  & minprob >= 0) | length(minprob) != groups)
+    stop(paste("minprob should be a vector of values between 0-1 (0 <= x <= 1)",
+               "and should be of length equal to the number of groups."))
+
+  if(sum(minprob) != 1)
+    stop("minprob must sum to 1")
+
+  if(!all(factors %in% names(data)))
+    stop("The factors must be variables in the provided data")
+
+  if(!is.null(stratify)) {
+    if(!stratify %in% names(data)) {
+      stop(paste("stratify must either be NULL (for no stratification) or a",
+                 "variable provided in the data"))
+    }
+  }
+
+  if(burnin == 0) {
+    warning("Burnin must be greater than 0, it has been updated to 1.")
+    burnin <- 1
+  }
 
   sampsize <- nrow(data)
   n.factors <- length(factors)
@@ -113,7 +141,7 @@ print.mini <- function(x, ...){
   cat("Burnin:", burnin(x), "\n")
   cat("Minimisation probabilities:",
       paste(round(minprob(x), 2), collapse = ", "), "\n")
-  cat("Group sizes:", paste(table(x$Group), collapse = ", "))
+  cat("Group sizes:", paste(table(x$Group), collapse = ", "), "\n")
 
   return(invisible(x))
 
