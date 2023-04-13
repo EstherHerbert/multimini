@@ -93,6 +93,7 @@ minimise <- function(data, groups = 3, factors, burnin = 10,
   burnin(out) <- burnin
   minprob(out) <- minprob
   strata(out) <- stratify
+  ratio(out) <- ratio
 
   return(out)
 

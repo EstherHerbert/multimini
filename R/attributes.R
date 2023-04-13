@@ -42,3 +42,12 @@ strata <- function(x) {
   attr(x, "strata") <- value
   return(x)
 }
+
+ratio <- function(x) {
+  return(attr(x, "ratio"))
+}
+
+`ratio<-` <- function(x, value) {
+  attr(x, "ratio") <- value
+  return(x)
+}
