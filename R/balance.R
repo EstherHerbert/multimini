@@ -18,12 +18,14 @@ balance <- function(object) {
 
   imbalance <- rep(NA, length(factors))
   for(i in 1:length(factors)) {
-    imbalance[i] <- sum(apply(tab[[i]], 2, stats::sd))
+    temp <- t(tab[[i]]) %*% diag(1/ratio(object))
+    imbalance[i] <- sum(apply(temp, 1, stats::sd))
   }
+
   imbalance <- sum(imbalance)
 
   out <- list(balance = tab, imbalance = imbalance, groups = groups(object),
-              factors = factors)
+              factors = factors, ratio = ratio(object))
   class(out) <- "balance.mini"
 
   return(out)
@@ -39,7 +41,7 @@ print.balance.mini <- function(x, ...) {
                               format = "markdown")
   }
   cat("Balance of factors (", paste(x$factors, collapse = ", "), ") over",
-      x$groups, "groups\n")
+      x$groups, "groups (", paste(x$ratio, collapse = ":"), ")\n")
   cat(rep("-", 80), "\n", sep = "")
   cat(do.call("paste", c(temp, sep = "    ")), sep = "\n")
   cat("\nTotal imbalance:", round(x$imbalance, 3))

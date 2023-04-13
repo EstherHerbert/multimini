@@ -10,7 +10,8 @@ minimise(
   factors,
   burnin = 10,
   minprob = c(0.8, rep(0.2/(groups - 1), groups - 1)),
-  stratify = NULL
+  stratify = NULL,
+  ratio = c(1, 1, 1)
 )
 }
 \arguments{
@@ -34,6 +35,9 @@ the remaining probability equally to the other groups.}
 \item{stratify}{if stratification is to be used then a character string
 specifying the name of the stratification variable (e.g.,
 "site"). Default is `NULL` for no stratification.}
+
+\item{ratio}{a numeric vector of randomisation ratios (must be of length
+equal to the number of groups)}
 }
 \value{
 (Invisibly) the data.frame with an additional column `Group` indicating
