@@ -26,7 +26,7 @@
 #' @export
 minimise <- function(data, groups = 3, factors, burnin = 10,
                      minprob = c(0.8, rep(0.2/(groups - 1), groups - 1)),
-                     stratify = NULL, ratio = c(1,1,1)){
+                     stratify = NULL, ratio = rep(1, groups)){
 
   # Check inputs
   if(groups < 2) {
@@ -48,6 +48,10 @@ minimise <- function(data, groups = 3, factors, burnin = 10,
       stop(paste("stratify must either be NULL (for no stratification) or a",
                  "variable provided in the data"))
     }
+  }
+
+  if(length(ratio) != groups) {
+    stop("ratio should have length equal to the number of groups")
   }
 
   if(burnin == 0) {
