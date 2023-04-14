@@ -100,7 +100,7 @@ minimise <- function(data, groups = 3, factors, burnin = 10,
         temp <- counts
         temp[, j] <- temp[, j] + 1
         num_level <- temp %*% diag(1/ratio)
-        sd_level <- apply(num_level, 1, sd)
+        sd_level <- apply(num_level, 1, stats::sd)
         scores[j] <- sum(sd_level)
       }
 

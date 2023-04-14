@@ -11,7 +11,7 @@ minimise(
   burnin = 10,
   minprob = c(0.8, rep(0.2/(groups - 1), groups - 1)),
   stratify = NULL,
-  ratio = c(1, 1, 1)
+  ratio = rep(1, groups)
 )
 }
 \arguments{
