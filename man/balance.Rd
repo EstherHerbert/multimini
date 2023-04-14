@@ -7,10 +7,10 @@
 balance(object)
 }
 \arguments{
-\item{object}{An object of class `mini`}
+\item{object}{An object of class \code{mini}}
 }
 \value{
-An object of class `balance.mini`
+An object of class \code{balance.mini}
 }
 \description{
 Get balance minimisation randomisation

@@ -12,3 +12,4 @@ RoxygenNote: 7.2.3
 Imports: 
     knitr
 License: MIT + file LICENSE
+Roxygen: list(markdown = TRUE)

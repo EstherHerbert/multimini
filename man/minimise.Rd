@@ -15,7 +15,7 @@ minimise(
 )
 }
 \arguments{
-\item{data}{a `data.frame` object with one line per participant and columns
+\item{data}{a \code{data.frame} object with one line per participant and columns
 for the minimisation factors.}
 
 \item{groups}{an integer, the number of groups to randomise to, default is 3}
@@ -27,24 +27,24 @@ default is 10. Must be >0 and < total sample size. When using
 stratification burnin must be smaller than the smallest strata
 size.}
 
-\item{minprob}{a vector of the same length as `groups` with the minimisation
+\item{minprob}{a vector of the same length as \code{groups} with the minimisation
 probabilities. The default is to give 0.8 probability to the
 group which would lead to the least imbalance and to allocate
 the remaining probability equally to the other groups.}
 
 \item{stratify}{if stratification is to be used then a character string
 specifying the name of the stratification variable (e.g.,
-"site"). Default is `NULL` for no stratification.}
+"site"). Default is \code{NULL} for no stratification.}
 
 \item{ratio}{a numeric vector of randomisation ratios (must be of length
 equal to the number of groups)}
 }
 \value{
-(Invisibly) the data.frame with an additional column `Group` indicating
+(Invisibly) the data.frame with an additional column \code{Group} indicating
 numerically which group has been allocated.
 }
 \description{
-`minimise` randomises patients in a data frame using minimisation
+\code{minimise} randomises patients in a data frame using minimisation
 }
 \examples{
 # Generate example data
