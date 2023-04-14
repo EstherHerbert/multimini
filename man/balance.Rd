@@ -15,3 +15,22 @@ An object of class `balance.mini`
 \description{
 Get balance minimisation randomisation
 }
+\examples{
+
+patients <- data.frame(sex = sample(c("M", "F"), 150, replace = TRUE),
+                       stage = sample(c("I", "II", "III"), 150,
+                                      replace = TRUE,
+                                      prob = c(0.5, 0.3, 0.2)),
+                       site = sample(1:10, 150, replace = TRUE))
+
+# Minimisation to 3 groups, with two factors and a burnin of 15
+mini <- minimise(patients, groups = 3, factors = c("sex", "stage"),
+                 burnin = 15)
+
+balance(mini)
+# When stratification is used `balance` gives the balance across strata too
+mini <- minimise(patients, groups = 3, factors = c("sex", "stage"),
+                 burnin = 5, stratify = "site")
+balance(mini)
+
+}

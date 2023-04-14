@@ -23,6 +23,28 @@
 #' @returns (Invisibly) the data.frame with an additional column `Group` indicating
 #' numerically which group has been allocated.
 #'
+#' @examples
+#' # Generate example data
+#' patients <- data.frame(sex = sample(c("M", "F"), 150, replace = TRUE),
+#'                        stage = sample(c("I", "II", "III"), 150, replace = TRUE,
+#'                                       prob = c(0.5, 0.3, 0.2)),
+#'                        site = sample(1:10, 150, replace = TRUE))
+#'
+#' # Minimisation to 3 groups, with two factors and a burnin of 15
+#' (mini <- minimise(patients, groups = 3, factors = c("sex", "stage"),
+#'                   burnin = 15))
+#'
+#' # View data with group info
+#' as.data.frame(mini)
+#'
+#' # Stratify minimisation by site
+#' minimise(patients, groups = 3, factors = c("sex", "stage"), burnin = 5,
+#'          stratify = "site")
+#'
+#' # Use 2:1:1 ratio
+#' minimise(patients, groups = 3, factors = c("sex", "stage"), burnin = 5,
+#'          stratify = "site", ratio = c(2,1,1))
+#'
 #' @export
 minimise <- function(data, groups = 3, factors, burnin = 10,
                      minprob = c(0.8, rep(0.2/(groups - 1), groups - 1)),
