@@ -25,8 +25,7 @@ balance <- function(object) {
 
   imbalance <- sum(imbalance)
 
-  out <- list(factor_balance = f_tab, imbalance = imbalance,
-              groups = groups(object), factors = factors, ratio = ratio(object))
+  out <- list(factor_balance = f_tab, imbalance = imbalance)
 
   # Balance across strata
   if(!is.null(strata(object))) {
@@ -36,6 +35,9 @@ balance <- function(object) {
   }
 
   class(out) <- "balance.mini"
+  groups(out) <- groups(object)
+  factors(out) <- factors
+  ratio(out) <- ratio(object)
 
   return(out)
 
@@ -53,8 +55,8 @@ print.balance.mini <- function(x, ...) {
     s_temp <- knitr::kable(x$strata_balance, format = "markdown")
   }
 
-  cat("Balance of factors (", paste(x$factors, collapse = ", "), ") over ",
-      x$groups, " groups (", paste(x$ratio, collapse = ":"), ")\n", sep = "")
+  cat("Balance of factors (", paste(factors(x), collapse = ", "), ") over ",
+      groups(x), " groups (", paste(ratio(x), collapse = ":"), ")\n", sep = "")
   cat(rep("-", 80), "\n", sep = "")
   cat(do.call("paste", c(f_temp, sep = "    ")), sep = "\n")
   if(!is.null(strata(x))) {
