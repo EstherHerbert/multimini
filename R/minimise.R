@@ -174,7 +174,7 @@ print.mini <- function(x, ...){
 }
 
 #' @export
-plot.mini <- function(x) {
+plot.mini <- function(x, show.plots = TRUE) {
 
   plots <- list()
 
@@ -203,9 +203,13 @@ plot.mini <- function(x) {
       ggplot2::theme(legend.position = "bottom")
   }
 
-  for(i in seq_along(plots)) {
-    invisible(readline("Press [enter] to see next plot:"))
-    print(plots[[i]])
+  if(show.plots) {
+    for(i in seq_along(plots)) {
+      invisible(readline("Press [enter] to see next plot:"))
+      ggplot2:::print.ggplot(plots[[i]])
+    }
   }
+
+  return(invisible(plots))
 
 }
