@@ -172,3 +172,40 @@ print.mini <- function(x, ...){
   return(invisible(x))
 
 }
+
+#' @export
+plot.mini <- function(x) {
+
+  plots <- list()
+
+  out <- data.frame(mini)
+
+  out$factors <- do.call(paste, c(out[factors(mini)], sep=":"))
+
+  plots$factors <-
+    ggplot2::ggplot(out, ggplot2::aes(factors, fill = factor(Group),
+                                      group = Group)) +
+    ggplot2::geom_bar(position = "dodge") +
+    ggplot2::labs(x = paste("Combinations of factors:",
+                            paste(factors(mini),collapse = ", ")),
+                  y = "Count", fill = "Group") +
+    ggplot2::theme_bw() +
+    ggplot2::theme(legend.position = "bottom")
+
+  if(!is.null(strata(mini))) {
+    out$strata <- out[,strata(mini)]
+    plots$strata <-
+      ggplot2::ggplot(out, ggplot2::aes(factor(strata), fill = factor(Group),
+                                        group = Group)) +
+      ggplot2::geom_bar(position = "dodge") +
+      ggplot2::labs(x = paste("Strata:", strata(mini)), y = "Count", fill = "Group") +
+      ggplot2::theme_bw() +
+      ggplot2::theme(legend.position = "bottom")
+  }
+
+  for(i in seq_along(plots)) {
+    invisible(readline("Press [enter] to see next plot:"))
+    print(plots[[i]])
+  }
+
+}
