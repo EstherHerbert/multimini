@@ -3,6 +3,8 @@
 S3method(plot,mini)
 S3method(print,balance.mini)
 S3method(print,mini)
+S3method(print,mini.sim)
 export(balance)
 export(minimise)
+export(simulate_mini)
 importFrom(knitr,kable)

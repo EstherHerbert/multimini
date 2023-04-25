@@ -1,3 +1,30 @@
+#' Simulation of minimisation
+#'
+#' `simulate_mini` repeatedly minimises a data set of patients with different
+#' specified burnin periods and/or minimisation probabilities. Its purpose is to
+#' guide decisions when designing a randomisation strategy for a randomised
+#' controlled trial.
+#'
+#' @param data a `data.frame` object with one line per participant and columns
+#'             for the minimisation factors.
+#' @param Nsims an integer, the number of simulations to run per scenario,
+#'              default is 100.
+#' @param groups an integer, the number of groups to randomise, default is 3.
+#' @param factors a character vector with the names of the factors for
+#'                minimisation
+#' @param burnin a vector of integers of possible burnin lengths before
+#'               minimisation kicks in. Individual values must be > 0 and
+#'               < total sample size. When using stratification burnin must be
+#'               smaller than the smallest strata size.
+#' @param minprob a list of vectors (each of the same length as `groups`) with
+#'                the possible minimisation probabilities.
+#' @param stratify if stratification is to be used then a character string
+#'                 specifying the name of the stratification variable (e.g.
+#'                 "site"). Default is `NULL` for no stratification.
+#' @param ratio a numeric vector of randomisation ratios (must be of length
+#'              equal to the number of groups).
+#'
+#' @export
 simulate_mini <- function(data, Nsims = 100, groups = 3, factors, burnin, minprob,
                           stratify = NULL, ratio = rep(1, groups)) {
 
@@ -26,12 +53,18 @@ simulate_mini <- function(data, Nsims = 100, groups = 3, factors, burnin, minpro
 
 }
 
+#' @export
 print.mini.sim <- function(x, ...) {
 
-  temp <- x
-  temp$inputs$imbalance <- sims$imbalance
-  tab <- with(temp$inputs, tapply(imbalance, list(burnin, minprob), FUN=mean))
-  tab <- round(tab, 2)
+  temp <- x$inputs
+  temp$imbalance <- sims$imbalance
+  temp$groups <- sims$group.sizes
+
+  tab_imb <- with(temp, tapply(imbalance, list(burnin, minprob), FUN=mean))
+  tab_imb <- round(tab_imb, 2)
+
+  tab_grp <- aggregate(groups ~ burnin + minprob, data=temp,
+                       FUN = function(x) round(mean(x), 1))
 
   cat("Simulation of Multi-arm Minimisation \n")
   cat(rep("-", 80), "\n", sep = "")
@@ -39,14 +72,8 @@ print.mini.sim <- function(x, ...) {
   cat("Burnin options:", paste(unique(x$inputs$burnin), collapse = ", "), "\n")
   cat("Minimisation probability options:",
       paste(unique(x$inputs$minprob), ncollapse = "; "), "\n")
+  cat("Average group sizes:\n")
+  cat(knitr::kable(tab_grp, format = "markdown"), sep = "\n")
   cat("Average imbalance:\n")
-  cat(knitr::kable(tab, format = "markdown"), sep = "\n")
+  cat(knitr::kable(tab_imb, format = "markdown"), sep = "\n")
 }
-
-temp <- sims$inputs
-temp$groups <- sims$group.sizes
-
-tab <- aggregate(groups ~ burnin + minprob, data=temp, FUN = function(x) round(mean(x), 2))
-
-knitr::kable(tab, format = "markdown")
-tab
