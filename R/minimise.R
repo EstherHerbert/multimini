@@ -178,32 +178,33 @@ print.mini <- function(x, ...){
 #' @param x an object of class `mini` as a result of `minimises`
 #' @param show.plots logical; if `FALSE` plots won't be displayed, useful when
 #'                   assigning the plots for future use.
+#' @param ... other parameters to be passed through to plotting functions.
 #' @export
-plot.mini <- function(x, show.plots = TRUE) {
+plot.mini <- function(x, show.plots = TRUE, ...) {
 
   plots <- list()
 
-  out <- data.frame(mini)
+  out <- data.frame(x)
 
-  out$factors <- do.call(paste, c(out[factors(mini)], sep=":"))
+  out$factors <- do.call(paste, c(out[factors(x)], sep=":"))
+  out$Group <- factor(out$Group)
 
   plots$factors <-
-    ggplot2::ggplot(out, ggplot2::aes(factors, fill = factor(Group),
-                                      group = Group)) +
+    ggplot2::ggplot(out, ggplot2::aes(factors, fill = Group, group = Group)) +
     ggplot2::geom_bar(position = "dodge") +
     ggplot2::labs(x = paste("Combinations of factors:",
-                            paste(factors(mini),collapse = ", ")),
+                            paste(factors(x),collapse = ", ")),
                   y = "Count", fill = "Group") +
     ggplot2::theme_bw() +
     ggplot2::theme(legend.position = "bottom")
 
-  if(!is.null(strata(mini))) {
-    out$strata <- out[,strata(mini)]
+  if(!is.null(strata(x))) {
+    out$strata <- out[,strata(x)]
     plots$strata <-
-      ggplot2::ggplot(out, ggplot2::aes(factor(strata), fill = factor(Group),
+      ggplot2::ggplot(out, ggplot2::aes(factor(strata), fill = Group,
                                         group = Group)) +
       ggplot2::geom_bar(position = "dodge") +
-      ggplot2::labs(x = paste("Strata:", strata(mini)), y = "Count", fill = "Group") +
+      ggplot2::labs(x = paste("Strata:", strata(x)), y = "Count", fill = "Group") +
       ggplot2::theme_bw() +
       ggplot2::theme(legend.position = "bottom")
   }
@@ -211,7 +212,7 @@ plot.mini <- function(x, show.plots = TRUE) {
   if(show.plots) {
     for(i in seq_along(plots)) {
       invisible(readline("Press [enter] to see next plot:"))
-      ggplot2:::print.ggplot(plots[[i]])
+      print(plots[[i]])
     }
   }
 
