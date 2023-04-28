@@ -42,7 +42,7 @@ simulate_mini <- function(data, Nsims = 100, groups = 3, factors, burnin, minpro
   inputs$minprob <- sapply(inputs$minprob, paste, collapse = ", ")
 
   imbalance <- mapply(function(x) balance(x)$imbalance, sims)
-  group.sizes <- t(sapply(sims, with, table(Group)))
+  group.sizes <- t(sapply(sims, function(x) with(x, table(Group))))
 
   out <- list(inputs = inputs, simulations = sims, group.sizes = group.sizes,
               imbalance = imbalance)
@@ -57,13 +57,13 @@ simulate_mini <- function(data, Nsims = 100, groups = 3, factors, burnin, minpro
 print.mini.sim <- function(x, ...) {
 
   temp <- x$inputs
-  temp$imbalance <- sims$imbalance
-  temp$groups <- sims$group.sizes
+  temp$imbalance <- x$imbalance
+  temp$groups <- x$group.sizes
 
   tab_imb <- with(temp, tapply(imbalance, list(burnin, minprob), FUN=mean))
   tab_imb <- round(tab_imb, 2)
 
-  tab_grp <- aggregate(groups ~ burnin + minprob, data=temp,
+  tab_grp <- stats::aggregate(groups ~ burnin + minprob, data=temp,
                        FUN = function(x) round(mean(x), 1))
 
   cat("Simulation of Multi-arm Minimisation \n")
