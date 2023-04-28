@@ -182,6 +182,8 @@ print.mini <- function(x, ...){
 #' @export
 plot.mini <- function(x, show.plots = TRUE, ...) {
 
+  Group <- NULL
+
   plots <- list()
 
   out <- data.frame(x)
