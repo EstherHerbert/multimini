@@ -29,9 +29,8 @@ simulate_mini <- function(data, Nsims = 100, groups = 3, factors, burnin, minpro
                           stratify = NULL, ratio = rep(1, groups)) {
 
   inputs <- expand.grid(sim.no = 1:Nsims,
-                        burnin = c(15, 10),
-                        minprob = list(c(0.8, 0.1, 0.1),
-                                       c(0.8, 0.15, 0.05)))
+                        burnin = burnin,
+                        minprob = minprob)
 
   sims <- mapply(
     function(x, y) minimise(data, factors = c("sex", "stage"), burnin = x,
