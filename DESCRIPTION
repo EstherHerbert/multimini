@@ -1,7 +1,7 @@
 Package: multimini
 Type: Package
 Title: Minimisation For Multi-Arm Trials
-Version: 0.1.0
+Version: 0.1.0.9000
 Author: Esther Herbert
 Maintainer: Esther Herbert <e.herbert@sheffield.ac.uk>
 Description: Minimisation for multi-arm trials with various methods for the
