@@ -174,6 +174,7 @@ print.mini <- function(x, ...){
 #' @param show.plots logical; if `FALSE` plots won't be displayed, useful when
 #'                   assigning the plots for future use.
 #' @param ... other parameters to be passed through to plotting functions.
+#'
 #' @export
 plot.mini <- function(x, show.plots = TRUE, ...) {
 
@@ -207,9 +208,12 @@ plot.mini <- function(x, show.plots = TRUE, ...) {
   }
 
   if(show.plots) {
-    for(i in seq_along(plots)) {
-      invisible(readline("Press [enter] to see next plot:"))
-      print(plots[[i]])
+    print(plots[[1]])
+    if(length(plots) > 1) {
+      for(i in 2:length(plots)) {
+        invisible(readline("Press [enter] to see next plot:"))
+        print(plots[[i]])
+      }
     }
   }
 
