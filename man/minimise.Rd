@@ -47,13 +47,8 @@ numerically which group has been allocated.
 \code{minimise} randomises patients in a data frame using minimisation
 }
 \examples{
-# Generate example data
-patients <- data.frame(sex = sample(c("M", "F"), 150, replace = TRUE),
-                       stage = sample(c("I", "II", "III"), 150, replace = TRUE,
-                                      prob = c(0.5, 0.3, 0.2)),
-                       site = sample(1:10, 150, replace = TRUE))
-
-# Minimisation to 3 groups, with two factors and a burnin of 15
+# Minimisation to 3 groups, with two factors and a burnin of 15, using the
+# patients data from the package
 (mini <- minimise(patients, groups = 3, factors = c("sex", "stage"),
                   burnin = 15))
 
