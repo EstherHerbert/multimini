@@ -1,7 +1,7 @@
 Package: multimini
 Type: Package
 Title: Minimisation For Multi-Arm Trials
-Version: 0.1.0
+Version: 0.1.0.9000
 Author: Esther Herbert
 Maintainer: Esther Herbert <e.herbert@sheffield.ac.uk>
 Description: Minimisation for multi-arm trials with various methods for the
@@ -11,6 +11,13 @@ LazyData: true
 RoxygenNote: 7.2.3
 Imports: 
     ggplot2,
-    knitr
+    ggpubr,
+    knitr,
+    shiny
 License: MIT + file LICENSE
 Roxygen: list(markdown = TRUE)
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Depends: 
+    R (>= 2.10)

@@ -24,13 +24,8 @@
 #' numerically which group has been allocated.
 #'
 #' @examples
-#' # Generate example data
-#' patients <- data.frame(sex = sample(c("M", "F"), 150, replace = TRUE),
-#'                        stage = sample(c("I", "II", "III"), 150, replace = TRUE,
-#'                                       prob = c(0.5, 0.3, 0.2)),
-#'                        site = sample(1:10, 150, replace = TRUE))
-#'
-#' # Minimisation to 3 groups, with two factors and a burnin of 15
+#' # Minimisation to 3 groups, with two factors and a burnin of 15, using the
+#' # patients data from the package
 #' (mini <- minimise(patients, groups = 3, factors = c("sex", "stage"),
 #'                   burnin = 15))
 #'
@@ -179,6 +174,7 @@ print.mini <- function(x, ...){
 #' @param show.plots logical; if `FALSE` plots won't be displayed, useful when
 #'                   assigning the plots for future use.
 #' @param ... other parameters to be passed through to plotting functions.
+#'
 #' @export
 plot.mini <- function(x, show.plots = TRUE, ...) {
 
@@ -212,9 +208,12 @@ plot.mini <- function(x, show.plots = TRUE, ...) {
   }
 
   if(show.plots) {
-    for(i in seq_along(plots)) {
-      invisible(readline("Press [enter] to see next plot:"))
-      print(plots[[i]])
+    print(plots[[1]])
+    if(length(plots) > 1) {
+      for(i in 2:length(plots)) {
+        invisible(readline("Press [enter] to see next plot:"))
+        print(plots[[i]])
+      }
     }
   }
 
