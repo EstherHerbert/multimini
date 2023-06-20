@@ -28,6 +28,16 @@
 simulate_mini <- function(data, Nsims = 100, groups = 3, factors, burnin, minprob,
                           stratify = NULL, ratio = rep(1, groups)) {
 
+  if(any(!unlist(factors) %in% names(data))) {
+    stop("Given factors must be variables in the data.")
+  }
+
+  if(any(!is.null(stratify))) {
+    if(any(!unlist(stratify) %in% names(data))) {
+      stop("`stratify` must be either NULL or a variable in the data.")
+    }
+  }
+
   inputs <- expand.grid(sim.no = 1:Nsims,
                         burnin = burnin,
                         minprob = minprob)
