@@ -13,6 +13,7 @@ Imports:
     ggplot2,
     ggpubr,
     knitr,
+    purrr,
     shiny
 License: MIT + file LICENSE
 Roxygen: list(markdown = TRUE)

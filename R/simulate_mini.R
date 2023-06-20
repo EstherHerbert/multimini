@@ -39,16 +39,33 @@ simulate_mini <- function(data, Nsims = 100, groups = 3, factors, burnin, minpro
   }
 
   inputs <- expand.grid(sim.no = 1:Nsims,
+                        factors = factors,
                         burnin = burnin,
-                        minprob = minprob)
+                        minprob = minprob,
+                        stratify = stratify)
+
+  minimise_s <- purrr::possibly(minimise, otherwise = NA)
 
   sims <- mapply(
-    function(x, y) minimise(data, factors = c("sex", "stage"), burnin = x,
-                            minprob = y),
-    inputs$burnin, inputs$minprob, SIMPLIFY = FALSE
+    function(x, y, z, w) minimise_s(data, factors = z, burnin = x,
+                                    minprob = y, stratify = w, ratio = ratio),
+    inputs$burnin, inputs$minprob, inputs$factors, inputs$stratify,
+    SIMPLIFY = FALSE
   )
 
+  if(any(is.na(sims))) {
+    warning(paste("Some combinations of inputs could not be used for",
+                  "minimisation, they have been removed from the list of",
+                  "inputs."), call. = FALSE)
+  }
+
   inputs$minprob <- sapply(inputs$minprob, paste, collapse = ", ")
+  inputs$factors <- sapply(inputs$factors, paste, collapse = ", ")
+  inputs$stratify[sapply(inputs$stratify, is.null)] <- "NULL"
+  inputs$stratify <- unlist(inputs$stratify)
+
+  inputs <- inputs[!is.na(sims),]
+  sims <- sims[!is.na(sims)]
 
   imbalance <- mapply(function(x) balance(x)$imbalance, sims)
   group.sizes <- t(sapply(sims, function(x) with(x, table(Group))))
@@ -69,18 +86,21 @@ print.mini.sim <- function(x, ...) {
   temp$imbalance <- x$imbalance
   temp$groups <- x$group.sizes
 
-  tab_imb <- with(temp, tapply(imbalance, list(burnin, minprob), FUN=mean))
-  tab_imb <- round(tab_imb, 2)
+  tab_imb <- stats::aggregate(imbalance ~ factors + burnin + minprob + stratify,
+                              data=temp, FUN = function(x) round(mean(x), 1))
 
-  tab_grp <- stats::aggregate(groups ~ burnin + minprob, data=temp,
-                       FUN = function(x) round(mean(x), 1))
+  tab_grp <- stats::aggregate(groups ~ factors + burnin + minprob + stratify,
+                              data=temp, FUN = function(x) round(mean(x), 1))
 
   cat("Simulation of Multi-arm Minimisation \n")
   cat(rep("-", 80), "\n", sep = "")
   cat("Number of simulations:", max(x$inputs$sim.no), "\n")
+  cat("Factor options:", paste(unique(x$inputs$factor), collapse = "; "), "\n")
   cat("Burnin options:", paste(unique(x$inputs$burnin), collapse = ", "), "\n")
   cat("Minimisation probability options:",
       paste(unique(x$inputs$minprob), ncollapse = "; "), "\n")
+  cat("Stratification options:",
+      paste(unique(x$inputs$stratify), collapse = ", "), "\n")
   cat("Average group sizes:\n")
   cat(knitr::kable(tab_grp, format = "markdown"), sep = "\n")
   cat("Average imbalance:\n")
