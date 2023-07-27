@@ -92,10 +92,13 @@ minimise <- function(data, groups = 3, factors, burnin = 10,
   for(s in 1:length(out)) {
     sampsize <- nrow(out[[s]])
     # Burn-in phase
-    if(burnin >= sampsize)
+    if(burnin >= sampsize) {
       stop(paste0("Specified burnin must be less than the smallest strata",
                   "size (", min(sapply(out, nrow)), ")."))
-    out[[s]]$Group[1:burnin] <- sample(1:groups, burnin, replace = T)
+    }
+
+    out[[s]]$Group[1:burnin] <- sample(1:groups, burnin, replace = T,
+                                       prob = ratio/sum(ratio))
 
     # Minimisation
     for(i in (burnin + 1):sampsize){
