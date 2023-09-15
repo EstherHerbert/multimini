@@ -26,7 +26,8 @@ minimise_app <- function(data, ...) {
         shiny::uiOutput("ratioInput"),
         shiny::checkboxInput("stratify", "Stratify minimisation?"),
         shiny::uiOutput("stratifyInput"),
-        shiny::actionButton("minimise", "Minimise")
+        shiny::actionButton("minimise", "Minimise"),
+        shiny::downloadButton("download", label = "Download csv")
       ),
 
       shiny::mainPanel(
@@ -90,6 +91,15 @@ minimise_app <- function(data, ...) {
     output$plot <- shiny::renderPlot({
       ggpubr::ggarrange(plotlist = plots(), ncol = 1)
     })
+
+    output$download <- shiny::downloadHandler(
+      filename = function() {
+        paste0("minimise_", format(Sys.time(), "%Y%m%d"), ".csv")
+      },
+      content = function(file) {
+        write.csv(mini(), file)
+      }
+    )
 
   }
 
