@@ -25,7 +25,8 @@ minimise_app <- function(data, ...) {
                             step = 1),
         shiny::uiOutput("ratioInput"),
         shiny::checkboxInput("stratify", "Stratify minimisation?"),
-        shiny::uiOutput("stratifyInput")
+        shiny::uiOutput("stratifyInput"),
+        shiny::actionButton("minimise", "Minimise")
       ),
 
       shiny::mainPanel(
@@ -59,17 +60,18 @@ minimise_app <- function(data, ...) {
       }
     })
 
-    mini <- shiny::reactive({
+    mini <- shiny::eventReactive(input$minimise, {
       shiny::req(input$minprob1); shiny::req(input$factors)
       minprob <- sapply(1:input$groups,
                         function(i) input[[paste0("minprob", i)]])
+      ratio <- sapply(1:input$groups, function(i) input[[paste0("ratio", i)]])
       if(input$stratify) {
         stratvar <- input$stratvar
       } else {
         stratvar <- NULL
       }
       minimise(data, groups = input$groups, factors = input$factors,
-               burnin = input$burnin, minprob = minprob,
+               burnin = input$burnin, minprob = minprob, ratio = ratio,
                stratify = stratvar)
     })
 
