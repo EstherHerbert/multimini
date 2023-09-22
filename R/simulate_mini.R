@@ -18,9 +18,8 @@
 #'               smaller than the smallest strata size.
 #' @param minprob a list of vectors (each of the same length as `groups`) with
 #'                the possible minimisation probabilities.
-#' @param stratify if stratification is to be used then a character string
-#'                 specifying the name of the stratification variable (e.g.
-#'                 "site"). Default is `NULL` for no stratification.
+#' @param stratify a list of stratification options, see [minimise()] for more
+#'                 information.
 #' @param ratio a numeric vector of randomisation ratios (must be of length
 #'              equal to the number of groups).
 #'
@@ -36,6 +35,10 @@ simulate_mini <- function(data, Nsims = 100, groups = 3, factors, burnin, minpro
     if(any(!unlist(stratify) %in% names(data))) {
       stop("`stratify` must be either NULL or a variable in the data.")
     }
+  }
+
+  if(is.null(stratify)) {
+    stratify <- list(NULL)
   }
 
   inputs <- expand.grid(sim.no = 1:Nsims,

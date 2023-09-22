@@ -35,9 +35,8 @@ smaller than the smallest strata size.}
 \item{minprob}{a list of vectors (each of the same length as \code{groups}) with
 the possible minimisation probabilities.}
 
-\item{stratify}{if stratification is to be used then a character string
-specifying the name of the stratification variable (e.g.
-"site"). Default is \code{NULL} for no stratification.}
+\item{stratify}{a list of stratification options, see \code{\link[=minimise]{minimise()}} for more
+information.}
 
 \item{ratio}{a numeric vector of randomisation ratios (must be of length
 equal to the number of groups).}
