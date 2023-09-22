@@ -19,9 +19,11 @@
 #'                 "site"). Default is `NULL` for no stratification.
 #' @param ratio a numeric vector of randomisation ratios (must be of length
 #'              equal to the number of groups)
+#' @param group.names optional, a character vector with the group names, must be
+#'  the same length as `groups`.
 #'
 #' @returns (Invisibly) the data.frame with an additional column `Group` indicating
-#' numerically which group has been allocated.
+#'   numerically which group has been allocated.
 #'
 #' @examples
 #' # Minimisation to 3 groups, with two factors and a burnin of 15, using the
@@ -43,7 +45,7 @@
 #' @export
 minimise <- function(data, groups = 3, factors, burnin = 10,
                      minprob = c(0.8, rep(0.2/(groups - 1), groups - 1)),
-                     stratify = NULL, ratio = rep(1, groups)){
+                     stratify = NULL, ratio = rep(1, groups), group.names = NULL){
 
   # Check inputs
   if(groups < 2) {
@@ -68,12 +70,18 @@ minimise <- function(data, groups = 3, factors, burnin = 10,
   }
 
   if(length(ratio) != groups) {
-    stop("ratio should have length equal to the number of groups")
+    stop("ratio should have length equal to the number of groups.")
   }
 
   if(burnin == 0) {
     warning("Burnin must be greater than 0, it has been updated to 1.")
     burnin <- 1
+  }
+
+  if(!is.null(group.names)) {
+    if(length(group.names) != groups) {
+      stop("group.names should have length equal to the number of groups.")
+    }
   }
 
   sampsize <- nrow(data)
@@ -138,6 +146,10 @@ minimise <- function(data, groups = 3, factors, burnin = 10,
 
   out <- do.call(rbind, out)
   row.names(out) <- NULL
+
+  if(!is.null(group.names)) {
+    out$Group <- factor(out$Group, levels = 1:groups, labels = group.names)
+  }
 
   class(out) <- c("mini", "data.frame")
   groups(out) <- groups
