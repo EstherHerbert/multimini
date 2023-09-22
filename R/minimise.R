@@ -193,8 +193,6 @@ print.mini <- function(x, ...){
 #' @export
 plot.mini <- function(x, show.plots = TRUE, ...) {
 
-  Group <- NULL
-
   plots <- list()
 
   out <- data.frame(x)
@@ -202,9 +200,13 @@ plot.mini <- function(x, show.plots = TRUE, ...) {
   out$factors <- do.call(paste, c(out[factors(x)], sep=":"))
   out$Group <- factor(out$Group)
 
+  ratio <- paste("Allocation ratio:", paste(ratio(x), collapse = ":"))
+
   plots$factors <-
     ggplot2::ggplot(out, ggplot2::aes(factors, fill = Group, group = Group)) +
     ggplot2::geom_bar(position = "dodge") +
+    ggplot2::annotate("label", x = Inf, y = Inf, label = ratio, vjust = 1.5,
+                      hjust = 1.5) +
     ggplot2::labs(x = paste("Combinations of factors:",
                             paste(factors(x),collapse = ", ")),
                   y = "Count", fill = "Group") +
@@ -217,6 +219,8 @@ plot.mini <- function(x, show.plots = TRUE, ...) {
       ggplot2::ggplot(out, ggplot2::aes(factor(strata), fill = Group,
                                         group = Group)) +
       ggplot2::geom_bar(position = "dodge") +
+      ggplot2::annotate("label", x = Inf, y = Inf, label = ratio, vjust = 1.5,
+                        hjust = 1.5) +
       ggplot2::labs(x = paste("Strata:", strata(x)), y = "Count", fill = "Group") +
       ggplot2::theme_bw() +
       ggplot2::theme(legend.position = "bottom")
