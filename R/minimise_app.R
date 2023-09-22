@@ -14,6 +14,8 @@ minimise_app <- function(data, ...) {
 
       shiny::sidebarPanel(
         shiny::numericInput("groups", "Number of groups", value = 3, min = 2),
+        shiny::checkboxInput("names", "Give group names?"),
+        shiny::uiOutput("groupnamesInput"),
         shiny::selectInput("factors", "Factor variable(s)", choices = names(data),
                            multiple = T),
         shiny::numericInput("burnin", "Length of burnin period", min = 1,
@@ -25,7 +27,11 @@ minimise_app <- function(data, ...) {
                             step = 1),
         shiny::uiOutput("ratioInput"),
         shiny::checkboxInput("stratify", "Stratify minimisation?"),
-        shiny::uiOutput("stratifyInput")
+        shiny::uiOutput("stratifyInput"),
+        shiny::checkboxInput("seed", "Set seed?"),
+        shiny::uiOutput("seedInput"),
+        shiny::actionButton("minimise", "Minimise"),
+        shiny::downloadButton("download", label = "Download csv")
       ),
 
       shiny::mainPanel(
@@ -59,18 +65,45 @@ minimise_app <- function(data, ...) {
       }
     })
 
-    mini <- shiny::reactive({
+    output$groupnamesInput <- shiny::renderUI({
+      if(input$names) {
+        lapply(1:input$groups, function(i) {
+          shiny::textInput(paste0("name", i), NULL)
+        })
+      }
+    })
+
+    output$seedInput <- shiny::renderUI({
+      if(input$seed) {
+        shiny::numericInput("seed.n", NULL, value = NULL)
+      }
+    })
+
+    mini <- shiny::eventReactive(input$minimise, {
       shiny::req(input$minprob1); shiny::req(input$factors)
+      if(input$names) {
+        names <- sapply(1:input$groups,
+                        function(i) input[[paste0("name", i)]])
+      } else {
+        names <- NULL
+      }
       minprob <- sapply(1:input$groups,
                         function(i) input[[paste0("minprob", i)]])
+      ratio <- sapply(1:input$groups, function(i) input[[paste0("ratio", i)]])
       if(input$stratify) {
         stratvar <- input$stratvar
       } else {
         stratvar <- NULL
       }
+      if(input$seed) {
+        seed.n <- input$seed.n
+      } else {
+        seed.n <- NULL
+      }
+
       minimise(data, groups = input$groups, factors = input$factors,
-               burnin = input$burnin, minprob = minprob,
-               stratify = stratvar)
+               burnin = input$burnin, minprob = minprob, ratio = ratio,
+               stratify = stratvar, group.names = names, seed = seed.n)
     })
 
     output$minimise <- shiny::renderPrint({
@@ -88,6 +121,15 @@ minimise_app <- function(data, ...) {
     output$plot <- shiny::renderPlot({
       ggpubr::ggarrange(plotlist = plots(), ncol = 1)
     })
+
+    output$download <- shiny::downloadHandler(
+      filename = function() {
+        paste0("minimise_", format(Sys.time(), "%Y%m%d"), ".csv")
+      },
+      content = function(file) {
+        write.csv(mini(), file)
+      }
+    )
 
   }
 

@@ -11,7 +11,9 @@ minimise(
   burnin = 10,
   minprob = c(0.8, rep(0.2/(groups - 1), groups - 1)),
   stratify = NULL,
-  ratio = rep(1, groups)
+  ratio = rep(1, groups),
+  group.names = NULL,
+  seed = NULL
 )
 }
 \arguments{
@@ -38,6 +40,12 @@ specifying the name of the stratification variable (e.g.,
 
 \item{ratio}{a numeric vector of randomisation ratios (must be of length
 equal to the number of groups)}
+
+\item{group.names}{optional, a character vector with the group names, must be
+the same length as \code{groups}.}
+
+\item{seed}{optional, an integer that is used with \code{set.seed()} for
+offsetting the random number generator.}
 }
 \value{
 (Invisibly) the data.frame with an additional column \code{Group} indicating
