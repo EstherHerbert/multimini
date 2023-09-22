@@ -14,6 +14,8 @@ minimise_app <- function(data, ...) {
 
       shiny::sidebarPanel(
         shiny::numericInput("groups", "Number of groups", value = 3, min = 2),
+        shiny::checkboxInput("names", "Give group names?"),
+        shiny::uiOutput("groupnamesInput"),
         shiny::selectInput("factors", "Factor variable(s)", choices = names(data),
                            multiple = T),
         shiny::numericInput("burnin", "Length of burnin period", min = 1,
@@ -61,8 +63,22 @@ minimise_app <- function(data, ...) {
       }
     })
 
+    output$groupnamesInput <- shiny::renderUI({
+      if(input$names) {
+        lapply(1:input$groups, function(i) {
+          shiny::textInput(paste0("name", i), NULL)
+        })
+      }
+    })
+
     mini <- shiny::eventReactive(input$minimise, {
       shiny::req(input$minprob1); shiny::req(input$factors)
+      if(input$names) {
+        names <- sapply(1:input$groups,
+                        function(i) input[[paste0("name", i)]])
+      } else {
+        names <- NULL
+      }
       minprob <- sapply(1:input$groups,
                         function(i) input[[paste0("minprob", i)]])
       ratio <- sapply(1:input$groups, function(i) input[[paste0("ratio", i)]])
@@ -73,7 +89,7 @@ minimise_app <- function(data, ...) {
       }
       minimise(data, groups = input$groups, factors = input$factors,
                burnin = input$burnin, minprob = minprob, ratio = ratio,
-               stratify = stratvar)
+               stratify = stratvar, group.names = names)
     })
 
     output$minimise <- shiny::renderPrint({
