@@ -28,6 +28,8 @@ minimise_app <- function(data, ...) {
         shiny::uiOutput("ratioInput"),
         shiny::checkboxInput("stratify", "Stratify minimisation?"),
         shiny::uiOutput("stratifyInput"),
+        shiny::checkboxInput("seed", "Set seed?"),
+        shiny::uiOutput("seedInput"),
         shiny::actionButton("minimise", "Minimise"),
         shiny::downloadButton("download", label = "Download csv")
       ),
@@ -71,6 +73,12 @@ minimise_app <- function(data, ...) {
       }
     })
 
+    output$seedInput <- shiny::renderUI({
+      if(input$seed) {
+        shiny::numericInput("seed.n", NULL, value = NULL)
+      }
+    })
+
     mini <- shiny::eventReactive(input$minimise, {
       shiny::req(input$minprob1); shiny::req(input$factors)
       if(input$names) {
@@ -87,9 +95,15 @@ minimise_app <- function(data, ...) {
       } else {
         stratvar <- NULL
       }
+      if(input$seed) {
+        seed.n <- input$seed.n
+      } else {
+        seed.n <- NULL
+      }
+
       minimise(data, groups = input$groups, factors = input$factors,
                burnin = input$burnin, minprob = minprob, ratio = ratio,
-               stratify = stratvar, group.names = names)
+               stratify = stratvar, group.names = names, seed = seed.n)
     })
 
     output$minimise <- shiny::renderPrint({

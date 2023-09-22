@@ -51,3 +51,12 @@ ratio <- function(x) {
   attr(x, "ratio") <- value
   return(x)
 }
+
+seed <- function(x) {
+  return(attr(x, "seed"))
+}
+
+`seed<-` <- function(x, value) {
+  attr(x, "seed") <- value
+  return(x)
+}

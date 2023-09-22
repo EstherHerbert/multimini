@@ -20,7 +20,9 @@
 #' @param ratio a numeric vector of randomisation ratios (must be of length
 #'              equal to the number of groups)
 #' @param group.names optional, a character vector with the group names, must be
-#'  the same length as `groups`.
+#'                    the same length as `groups`.
+#' @param seed optional, an integer that is used with `set.seed()` for
+#'             offsetting the random number generator.
 #'
 #' @returns (Invisibly) the data.frame with an additional column `Group` indicating
 #'   numerically which group has been allocated.
@@ -45,7 +47,8 @@
 #' @export
 minimise <- function(data, groups = 3, factors, burnin = 10,
                      minprob = c(0.8, rep(0.2/(groups - 1), groups - 1)),
-                     stratify = NULL, ratio = rep(1, groups), group.names = NULL){
+                     stratify = NULL, ratio = rep(1, groups),
+                     group.names = NULL, seed = NULL){
 
   # Check inputs
   if(groups < 2) {
@@ -95,6 +98,10 @@ minimise <- function(data, groups = 3, factors, burnin = 10,
     out <- split(out, out[, stratify])
   } else {
     out <- list(out)
+  }
+
+  if(!is.null(seed)) {
+    set.seed(seed)
   }
 
   for(s in 1:length(out)) {
@@ -158,6 +165,7 @@ minimise <- function(data, groups = 3, factors, burnin = 10,
   minprob(out) <- minprob
   strata(out) <- stratify
   ratio(out) <- ratio
+  seed(out) <- seed
 
   return(out)
 
@@ -168,6 +176,9 @@ print.mini <- function(x, ...){
 
   cat("Multi-arm Minimisation \n")
   cat(rep("-", 80), "\n", sep = "")
+  if(!is.null(seed(x))) {
+    cat("Seed:", seed(x), "\n")
+  }
   cat("Number of groups:", groups(x), "\n")
   cat("Randomisation ratio:", paste(ratio(x), collapse = ":"), "\n")
   cat("Factors:", paste(factors(x), collapse = ", "), "\n")
