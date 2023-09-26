@@ -31,7 +31,8 @@ minimise_app <- function(data, ...) {
         shiny::checkboxInput("seed", "Set seed?"),
         shiny::uiOutput("seedInput"),
         shiny::actionButton("minimise", "Minimise"),
-        shiny::downloadButton("download", label = "Download csv")
+        shiny::downloadButton("download", label = "Download csv"),
+        shiny::downloadButton("report", label = "Generate report")
       ),
 
       shiny::mainPanel(
@@ -128,6 +129,29 @@ minimise_app <- function(data, ...) {
       },
       content = function(file) {
         write.csv(mini(), file)
+      }
+    )
+
+    output$report <- downloadHandler(
+      filename = "report.html",
+      content = function(file) {
+        # Copy the report file to a temporary directory before processing it, in
+        # case we don't have write permissions to the current working dir (which
+        # can happen when deployed).
+        tempReport <- file.path(tempdir(), "report.Rmd")
+        file.copy(system.file("report.Rmd", package = "multimini"),
+                  tempReport, overwrite = TRUE)
+
+        # Set up parameters to pass to Rmd document
+        params <- list(mini = mini(), plots = plots())
+
+        # Knit the document, passing in the `params` list, and eval it in a
+        # child of the global environment (this isolates the code in the document
+        # from the code in this app).
+        rmarkdown::render(tempReport, output_file = file,
+                          params = params,
+                          envir = new.env(parent = globalenv())
+        )
       }
     )
 
