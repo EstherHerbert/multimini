@@ -31,8 +31,10 @@ minimise_app <- function(data, ...) {
         shiny::checkboxInput("seed", "Set seed?"),
         shiny::uiOutput("seedInput"),
         shiny::actionButton("minimise", "Minimise"),
-        shiny::downloadButton("download", label = "Download csv"),
-        shiny::downloadButton("report", label = "Generate report")
+        shiny::tags$br(),
+        shiny::tags$br(),
+        shiny::downloadButton("download", label = "Download allocations"),
+        shiny::downloadButton("report", label = "Download report")
       ),
 
       shiny::mainPanel(
@@ -128,7 +130,7 @@ minimise_app <- function(data, ...) {
         paste0("minimise_", format(Sys.time(), "%Y%m%d"), ".csv")
       },
       content = function(file) {
-        write.csv(mini(), file)
+        write.csv(mini(), file, row.names = FALSE)
       }
     )
 
