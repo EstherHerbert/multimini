@@ -10,7 +10,7 @@
 #' @param Nsims an integer, the number of simulations to run per scenario,
 #'              default is 100.
 #' @param groups an integer, the number of groups to randomise, default is 3.
-#' @param factors a character vector with the names of the factors for
+#' @param factors a list of character vectors with the names of the factors for
 #'                minimisation
 #' @param burnin a vector of integers of possible burnin lengths before
 #'               minimisation kicks in. Individual values must be > 0 and

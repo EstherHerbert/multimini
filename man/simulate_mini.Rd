@@ -24,7 +24,7 @@ default is 100.}
 
 \item{groups}{an integer, the number of groups to randomise, default is 3.}
 
-\item{factors}{a character vector with the names of the factors for
+\item{factors}{a list of character vectors with the names of the factors for
 minimisation}
 
 \item{burnin}{a vector of integers of possible burnin lengths before
