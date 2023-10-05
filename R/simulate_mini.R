@@ -97,7 +97,7 @@ print.mini.sim <- function(x, ...) {
 
   cat("Simulation of Multi-arm Minimisation \n")
   cat(rep("-", 80), "\n", sep = "")
-  cat("Number of simulations:", max(x$inputs$sim.no), "\n")
+  cat("Number of simulations per scenario:", max(x$inputs$sim.no), "\n")
   cat("Factor options:", paste(unique(x$inputs$factor), collapse = "; "), "\n")
   cat("Burnin options:", paste(unique(x$inputs$burnin), collapse = ", "), "\n")
   cat("Minimisation probability options:",
