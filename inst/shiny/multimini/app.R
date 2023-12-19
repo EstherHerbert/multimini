@@ -1,5 +1,7 @@
 ui <- shiny::fluidPage(
 
+  rclipboard::rclipboardSetup(),
+
   shiny::titlePanel("Multi Arm Minimisation"),
 
   shiny::sidebarLayout(
@@ -36,6 +38,7 @@ ui <- shiny::fluidPage(
       shiny::verbatimTextOutput("minimise"),
       shiny::verbatimTextOutput("balance"),
       shiny::plotOutput("plot"),
+      shiny::uiOutput("clip"),
       shiny::verbatimTextOutput("code")
     )
   )
@@ -166,9 +169,9 @@ server <- function(input, output, session) {
       "library(multimini)\n",
       "# Running the following code within R will produce the results\n",
       "# NB: if seed is not set then the results may differ\n",
-      "data <- read.csv(", input$data$name, ")  # make sure the file is in ",
+      "data <- read.csv(\"", input$data$name, "\")  # make sure the file is in ",
       "your working directory\n",
-      "minimise(data, ",
+      "mini <- minimise(data, ",
       "groups = ", input$groups, ", ",
       "factors = c(", paste0("\"", input$factors, "\"", collapse = ", "), "), ",
       "burnin = ", input$burnin, ", ",
@@ -177,13 +180,25 @@ server <- function(input, output, session) {
       ifelse(input$stratify, paste0(", stratify = ", stratvar), ""),
       ifelse(input$names, paste0(", group.names = ", names), ""),
       ifelse(input$seed, paste0(", seed = ", seed.n), ""),
-      ")\n"
+      ")\n",
+      "mini\n",
+      "balance(mini)\n",
+      "plot(mini)\n"
     )
   })
 
-  output$code <- renderText({
-    req(input$code)
+  output$code <- shiny::renderText({
+    shiny::req(input$code)
     code()
+  })
+
+  output$clip <- shiny::renderUI({
+    rclipboard::rclipButton(
+      inputId = "clipbtn",
+      label = "Copy",
+      clipText = code(),
+      icon = shiny::icon("clipboard")
+    )
   })
 
   output$download <- shiny::downloadHandler(
