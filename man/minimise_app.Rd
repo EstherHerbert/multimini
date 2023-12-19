@@ -4,7 +4,7 @@
 \alias{minimise_app}
 \title{App interface for the multimini package}
 \usage{
-minimise_app(data, ...)
+minimise_app()
 }
 \arguments{
 \item{data}{patient data}
