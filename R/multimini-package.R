@@ -5,3 +5,5 @@
 #' @importFrom knitr kable
 ## usethis namespace: end
 NULL
+
+utils::globalVariables("Group")
