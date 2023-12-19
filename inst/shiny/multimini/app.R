@@ -26,6 +26,8 @@ ui <- shiny::fluidPage(
       shiny::actionButton("minimise", "Minimise"),
       shiny::tags$br(),
       shiny::tags$br(),
+      shiny::actionButton("code", label = "Generate Code",
+                          icon = shiny::icon(name = "code")),
       shiny::downloadButton("download", label = "Download allocations"),
       shiny::downloadButton("report", label = "Download report")
     ),
@@ -33,7 +35,8 @@ ui <- shiny::fluidPage(
     shiny::mainPanel(
       shiny::verbatimTextOutput("minimise"),
       shiny::verbatimTextOutput("balance"),
-      shiny::plotOutput("plot")
+      shiny::plotOutput("plot"),
+      shiny::verbatimTextOutput("code")
     )
   )
 )
@@ -127,6 +130,60 @@ server <- function(input, output, session) {
 
   output$plot <- shiny::renderPlot({
     ggpubr::ggarrange(plotlist = plots(), ncol = 1)
+  })
+
+  code <- shiny::eventReactive(input$code, {
+    shiny::req(data(), input$factors)
+    if(input$names) {
+      names <- sapply(1:input$groups,
+                      function(i) input[[paste0("name", i)]])
+      names <- paste0("c(", paste0("\"", names, "\"", collapse = ", "), ")")
+    } else {
+      names <- "NULL"
+    }
+
+    minprob <- sapply(1:input$groups, function(i) input[[paste0("minprob", i)]])
+    minprob <- paste(minprob, collapse = ", ")
+
+    ratio <- sapply(1:input$groups, function(i) input[[paste0("ratio", i)]])
+    ratio <- paste(ratio, collapse = ", ")
+
+    if(input$stratify) {
+      stratvar <- paste0("\"", input$stratvar, "\"")
+    } else {
+      stratvar <- "NULL"
+    }
+
+    if(input$seed) {
+      seed.n <- input$seed.n
+    } else {
+      seed.n <- "NULL"
+    }
+
+    paste0(
+      "install.packages(\"devtools\")\n",
+      "devtools::install_github(\"EstherHerbert/multimini\")\n",
+      "library(multimini)\n",
+      "# Running the following code within R will produce the results\n",
+      "# NB: if seed is not set then the results may differ\n",
+      "data <- read.csv(", input$data$name, ")  # make sure the file is in ",
+      "your working directory\n",
+      "minimise(data, ",
+      "groups = ", input$groups, ", ",
+      "factors = c(", paste0("\"", input$factors, "\"", collapse = ", "), "), ",
+      "burnin = ", input$burnin, ", ",
+      "minprob = c(", minprob, "), ",
+      "ratio = c(", ratio, ")",
+      ifelse(input$stratify, paste0(", stratify = ", stratvar), ""),
+      ifelse(input$names, paste0(", group.names = ", names), ""),
+      ifelse(input$seed, paste0(", seed = ", seed.n), ""),
+      ")\n"
+    )
+  })
+
+  output$code <- renderText({
+    req(input$code)
+    code()
   })
 
   output$download <- shiny::downloadHandler(
