@@ -2,6 +2,7 @@
 # multimini
 
 <!-- badges: start -->
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
 The goal of `multimini` is to use minimisation to randomise a multi-arm trial with various different techniques for the minimisation probabilities.
