@@ -12,6 +12,18 @@
 #' @returns (Invisibly) the data.frame of all participants with group existing
 #'   and new group allocations
 #'
+#' @examples
+#' mini <- minimise(patients, groups = 3, factors = c("sex", "stage"),
+#'                  burnin = 10)
+#'
+#' new.patients <- data.frame(
+#'   sex = c("F", "F", "M"),
+#'   stage = c("II","I", "I"),
+#'   site = c(9, 9, 1)
+#' )
+#'
+#' update(mini, new.patients)
+#'
 #' @export
 update.mini <- function(object, new.data, ...) {
 
