@@ -61,3 +61,15 @@ balance(mini)
 
 balance(mini_s)
 ```
+
+### Updating the miniisation
+
+``` r
+new.patients <- data.frame(
+ sex = c("F", "F", "M"),
+ stage = c("II","I", "I"),
+ site = c(9, 9, 1)
+)
+
+update(mini, new.patients) 
+```
