@@ -3,3 +3,5 @@
 ^LICENSE\.md$
 ^data-raw$
 ^\.git$
+^README\.Rmd$
+^logo$
