@@ -100,11 +100,12 @@ minimise <- function(data, groups = 3, factors, burnin = 10,
     out <- list(out)
   }
 
-  if(!is.null(seed)) {
-    set.seed(seed)
-  }
-
   for(s in 1:length(out)) {
+
+    if(!is.null(seed)) {
+      set.seed(seed)
+    }
+
     sampsize <- nrow(out[[s]])
     # Burn-in phase
     if(burnin >= sampsize) {
