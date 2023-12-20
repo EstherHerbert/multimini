@@ -6,6 +6,8 @@
 \alias{multimini-package}
 \title{multimini: Minimisation For Multi-Arm Trials}
 \description{
+\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
+
 Minimisation for multi-arm trials with various methods for the minimisation probabilities.
 }
 \keyword{internal}
