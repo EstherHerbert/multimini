@@ -7,7 +7,7 @@
 \method{update}{mini}(object, new.data, ...)
 }
 \arguments{
-\item{object}{an object of class mini, i.e., resulting from \code{minimise()}}
+\item{object}{an object of class mini, i.e., resulting from \code{\link[=minimise]{minimise()}}}
 
 \item{new.data}{a \code{data.frame} object with one line per new participant and
 columns for the minimisation factors. Must be of the same
@@ -34,4 +34,7 @@ new.patients <- data.frame(
 
 update(mini, new.patients)
 
+}
+\seealso{
+\code{\link[=update]{update()}} for the generic function
 }

@@ -4,13 +4,15 @@
 #' existing group allocations and factor information to allocate the new
 #' participants using minimisation.
 #'
-#' @param object an object of class mini, i.e., resulting from `minimise()`
+#' @param object an object of class mini, i.e., resulting from [minimise()]
 #' @param new.data a `data.frame` object with one line per new participant and
 #'                 columns for the minimisation factors. Must be of the same
 #'                 format as the `data.frame` in `object` (minus `Group`)
 #'
 #' @returns (Invisibly) the data.frame of all participants with group existing
 #'   and new group allocations
+#'
+#' @seealso [update()] for the generic function
 #'
 #' @examples
 #' mini <- minimise(patients, groups = 3, factors = c("sex", "stage"),
