@@ -1,8 +1,5 @@
 #' App interface for the multimini package
 #'
-#' @param data patient data
-#' @param ... options passed to `shiny::shinyApp()`
-#'
 #' @export
 minimise_app <- function() {
 

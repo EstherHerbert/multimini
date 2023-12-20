@@ -6,11 +6,6 @@
 \usage{
 minimise_app()
 }
-\arguments{
-\item{data}{patient data}
-
-\item{...}{options passed to \code{shiny::shinyApp()}}
-}
 \description{
 App interface for the multimini package
 }
