@@ -30,8 +30,11 @@ ui <- shiny::fluidPage(
       shiny::tags$br(),
       shiny::actionButton("code", label = "Generate Code",
                           icon = shiny::icon(name = "code")),
-      shiny::downloadButton("download", label = "Download allocations"),
-      shiny::downloadButton("report", label = "Download report")
+      shiny::downloadButton("download", label = "Download allocations",
+                            icon = shiny::icon(name = "file-csv")),
+      shiny::downloadButton("downloadRData", label = "Download R object"),
+      shiny::downloadButton("report", label = "Download report",
+                            icon = shiny::icon(name = "file"))
     ),
 
     shiny::mainPanel(
@@ -209,6 +212,15 @@ server <- function(input, output, session) {
       write.csv(mini(), file, row.names = FALSE)
     }
   )
+
+  output$downloadRData <- downloadHandler(
+    filename = "minimise.rds",
+    content = function(file) {
+      df <- mini()
+      saveRDS(df, file = file)
+    }
+  )
+
 
   output$report <- downloadHandler(
     filename = "report.html",
