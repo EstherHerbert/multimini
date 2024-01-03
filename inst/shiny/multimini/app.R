@@ -1,51 +1,78 @@
-ui <- shiny::fluidPage(
+# UI ---------------------------------------------------------------------------
+ui <- shiny::navbarPage(
+  title = "Multi Arm Minimisation",
 
-  rclipboard::rclipboardSetup(),
+  # Initialise -----------------------------------------------------------------
 
-  shiny::titlePanel("Multi Arm Minimisation"),
+  tabPanel(
+    title = "Initialise",
+    shiny::fluidPage(
 
-  shiny::sidebarLayout(
+      rclipboard::rclipboardSetup(),
 
-    shiny::sidebarPanel(
-      shiny::fileInput("data", "Participant Data"),
-      shiny::numericInput("groups", "Number of groups", value = 3, min = 2),
-      shiny::checkboxInput("names", "Give group names?"),
-      shiny::uiOutput("groupnamesInput"),
-      shiny::selectInput("factors", "Factor variable(s)", choices = NULL,
-                         multiple = T),
-      shiny::numericInput("burnin", "Length of burnin period", min = 1,
-                          value = 10),
-      shiny::numericInput("minprob1", "Minimisation probabilities", min = 0,
-                          max = 1, value = 0.8, step = 0.1),
-      shiny::uiOutput("minprobInput"),
-      shiny::numericInput("ratio1", "Ratios", min = 1, value = 1,
-                          step = 1),
-      shiny::uiOutput("ratioInput"),
-      shiny::checkboxInput("stratify", "Stratify minimisation?"),
-      shiny::uiOutput("stratifyInput"),
-      shiny::checkboxInput("seed", "Set seed?"),
-      shiny::uiOutput("seedInput"),
-      shiny::actionButton("minimise", "Minimise"),
-      shiny::tags$br(),
-      shiny::tags$br(),
-      shiny::actionButton("code", label = "Generate Code",
-                          icon = shiny::icon(name = "code")),
-      shiny::downloadButton("download", label = "Download allocations",
-                            icon = shiny::icon(name = "file-csv")),
-      shiny::downloadButton("downloadRData", label = "Download R object"),
-      shiny::downloadButton("report", label = "Download report",
-                            icon = shiny::icon(name = "file"))
-    ),
+      shiny::sidebarLayout(
 
-    shiny::mainPanel(
-      shiny::verbatimTextOutput("minimise"),
-      shiny::verbatimTextOutput("balance"),
-      shiny::plotOutput("plot"),
-      shiny::uiOutput("clip"),
-      shiny::verbatimTextOutput("code")
+        shiny::sidebarPanel(
+          shiny::fileInput("data", "Participant Data"),
+          shiny::numericInput("groups", "Number of groups", value = 3, min = 2),
+          shiny::checkboxInput("names", "Give group names?"),
+          shiny::uiOutput("groupnamesInput"),
+          shiny::selectInput("factors", "Factor variable(s)", choices = NULL,
+                             multiple = T),
+          shiny::numericInput("burnin", "Length of burnin period", min = 1,
+                              value = 10),
+          shiny::numericInput("minprob1", "Minimisation probabilities", min = 0,
+                              max = 1, value = 0.8, step = 0.1),
+          shiny::uiOutput("minprobInput"),
+          shiny::numericInput("ratio1", "Ratios", min = 1, value = 1,
+                              step = 1),
+          shiny::uiOutput("ratioInput"),
+          shiny::checkboxInput("stratify", "Stratify minimisation?"),
+          shiny::uiOutput("stratifyInput"),
+          shiny::checkboxInput("seed", "Set seed?"),
+          shiny::uiOutput("seedInput"),
+          shiny::actionButton("minimise", "Minimise"),
+          shiny::tags$br(),
+          shiny::tags$br(),
+          shiny::actionButton("code", label = "Generate Code",
+                              icon = shiny::icon(name = "code")),
+          shiny::downloadButton("download", label = "Download allocations",
+                                icon = shiny::icon(name = "file-csv")),
+          shiny::downloadButton("downloadRData", label = "Download R object"),
+          shiny::downloadButton("report", label = "Download report",
+                                icon = shiny::icon(name = "file"))
+        ),
+
+        shiny::mainPanel(
+          shiny::verbatimTextOutput("minimise"),
+          shiny::verbatimTextOutput("balance"),
+          shiny::plotOutput("plot"),
+          shiny::uiOutput("clip"),
+          shiny::verbatimTextOutput("code")
+        )
+      )
+    )
+  ),
+
+  # Update ---------------------------------------------------------------------
+
+  tabPanel(
+    title = "Update",
+    shiny::fluidPage(
+      shiny::sidebarLayout(
+        shiny::sidebarPanel(
+          shiny::fileInput("data.mini", "Minimisation to update"),
+          shiny::fileInput("new.data", "New patients to minimise")
+        ),
+        shiny::mainPanel(
+
+        )
+      )
     )
   )
 )
+
+# Server -----------------------------------------------------------------------
 
 server <- function(input, output, session) {
 
