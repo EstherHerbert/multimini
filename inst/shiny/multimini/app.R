@@ -63,8 +63,10 @@ ui <- shiny::navbarPage(
         shiny::sidebarPanel(
           shiny::fileInput("data.mini", "Minimisation to update",
                            accept = ".rds"),
-          shiny::fileInput("new.data", "New patients to minimise",
-                           accept = ".csv"),
+          shiny::radioButtons("new.format", "New patients",
+                              choices = c("As .csv", "Input factors")),
+          shiny::uiOutput("new.dataInput"),
+          shiny::actionButton("update", "Update minimisation"),
           shiny::downloadButton("update_download",
                                 label = "Download allocations",
                                 icon = shiny::icon(name = "file-csv")),
@@ -261,7 +263,6 @@ server <- function(input, output, session) {
     }
   )
 
-
   output$report <- downloadHandler(
     filename = "report.html",
     content = function(file) {
@@ -293,13 +294,30 @@ server <- function(input, output, session) {
     readRDS(input$data.mini$datapath)
   })
 
-  new.data <- shiny::reactive({
-    shiny::req(input$new.data)
-    read.csv(input$new.data$datapath)
+  output$new.dataInput <- shiny::renderUI({
+    switch(
+      input$new.format,
+      "As .csv" = shiny::fileInput("new.data", "New patients to minimise",
+                                   accept = ".csv"),
+      "Input factors" = lapply(factors(data.mini()), function(i) {
+        shiny::textInput(paste0("factor.", i), label = i)
+      })
+    )
   })
 
-  mini_u <- shiny::reactive({
-    shiny::req(input$data.mini, input$new.data)
+  new.data <- shiny::reactive({
+    shiny::req(input$new.format)
+    switch(
+      input$new.format,
+      "As .csv" = read.csv(input$new.data$datapath),
+      "Input factors" =
+        dplyr::bind_rows(sapply(factors(data.mini()),
+                             function(i) input[[paste0("factor.", i)]]))
+    )
+  })
+
+  mini_u <- shiny::eventReactive(input$update, {
+    shiny::req(input$data.mini, new.data())
     update(data.mini(), new.data())
   })
 
