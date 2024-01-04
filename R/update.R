@@ -29,9 +29,17 @@
 #' @export
 update.mini <- function(object, new.data, ...) {
 
+  if(!all(factors(object) %in% names(new.data))) {
+    stop("All minimisation factors must be included as columns in `new.data`",
+         call. = F)
+  } else if ("Group" %in% names(new.data)) {
+    warning("`new.data` already contains a Group variable, this will be ",
+            "overwritten", call. = F)
+  }
+
   new.data$Group <- NA
 
-  # TODO add checks for new data columns vs factors
+
 
   # TODO add check for stratification - with warning that it will be ignored
 
