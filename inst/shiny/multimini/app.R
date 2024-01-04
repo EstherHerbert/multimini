@@ -64,7 +64,14 @@ ui <- shiny::navbarPage(
           shiny::fileInput("data.mini", "Minimisation to update",
                            accept = ".rds"),
           shiny::fileInput("new.data", "New patients to minimise",
-                           accept = ".csv")
+                           accept = ".csv"),
+          shiny::downloadButton("update_download",
+                                label = "Download allocations",
+                                icon = shiny::icon(name = "file-csv")),
+          shiny::downloadButton("update_downloadRData",
+                                label = "Download R object"),
+          shiny::downloadButton("update_report", label = "Download report",
+                                icon = shiny::icon(name = "file"))
         ),
         shiny::mainPanel(
           shiny::verbatimTextOutput("update"),
@@ -311,6 +318,48 @@ server <- function(input, output, session) {
   output$update_plot <- shiny::renderPlot({
     ggpubr::ggarrange(plotlist = update_plots(), ncol = 1)
   })
+
+  output$update_download <- shiny::downloadHandler(
+    filename = function() {
+      paste0("update_minimise_", format(Sys.time(), "%Y%m%d"), ".csv")
+    },
+    content = function(file) {
+      write.csv(mini_u(), file, row.names = FALSE)
+    }
+  )
+
+  output$update_downloadRData <- downloadHandler(
+    filename = "update_minimise.rds",
+    content = function(file) {
+      df <- mini_u()
+      saveRDS(df, file = file)
+    }
+  )
+
+
+  output$update_report <- downloadHandler(
+    filename = "update_report.html",
+    content = function(file) {
+      # Copy the report file to a temporary directory before processing it, in
+      # case we don't have write permissions to the current working dir (which
+      # can happen when deployed).
+      tempReport <- file.path(tempdir(), "report.Rmd")
+      file.copy(system.file("shiny", "multimini", "report.Rmd",
+                            package = "multimini"),
+                tempReport, overwrite = TRUE)
+
+      # Set up parameters to pass to Rmd document
+      params <- list(mini = mini_u(), plots = update_plots())
+
+      # Knit the document, passing in the `params` list, and eval it in a
+      # child of the global environment (this isolates the code in the document
+      # from the code in this app).
+      rmarkdown::render(tempReport, output_file = file,
+                        params = params,
+                        envir = new.env(parent = globalenv())
+      )
+    }
+  )
 
   session$onSessionEnded(stopApp)
 
