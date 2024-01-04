@@ -31,7 +31,11 @@ update.mini <- function(object, new.data, ...) {
 
   new.data$Group <- NA
 
-  out <- rbind(as.data.frame(object), new.data)
+  # TODO add checks for new data columns vs factors
+
+  # TODO add check for stratification - with warning that it will be ignored
+
+  out <- dplyr::bind_rows(as.data.frame(object), new.data)
 
   n.factors <- length(factors(object))
 
