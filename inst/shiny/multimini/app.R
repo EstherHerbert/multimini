@@ -61,11 +61,15 @@ ui <- shiny::navbarPage(
     shiny::fluidPage(
       shiny::sidebarLayout(
         shiny::sidebarPanel(
-          shiny::fileInput("data.mini", "Minimisation to update"),
-          shiny::fileInput("new.data", "New patients to minimise")
+          shiny::fileInput("data.mini", "Minimisation to update",
+                           accept = ".rds"),
+          shiny::fileInput("new.data", "New patients to minimise",
+                           accept = ".csv")
         ),
         shiny::mainPanel(
-
+          shiny::verbatimTextOutput("update"),
+          shiny::verbatimTextOutput("update_balance"),
+          shiny::plotOutput("update_plot"),
         )
       )
     )
@@ -75,6 +79,8 @@ ui <- shiny::navbarPage(
 # Server -----------------------------------------------------------------------
 
 server <- function(input, output, session) {
+
+  # Initialise -----------------------------------------------------------------
 
   data <- shiny::reactive({
     shiny::req(input$data)
@@ -272,6 +278,39 @@ server <- function(input, output, session) {
       )
     }
   )
+
+  # Update ---------------------------------------------------------------------
+
+  data.mini <- shiny::reactive({
+    shiny::req(input$data.mini)
+    readRDS(input$data.mini$datapath)
+  })
+
+  new.data <- shiny::reactive({
+    shiny::req(input$new.data)
+    read.csv(input$new.data$datapath)
+  })
+
+  mini_u <- shiny::reactive({
+    shiny::req(input$data.mini, input$new.data)
+    update(data.mini(), new.data())
+  })
+
+  output$update <- shiny::renderPrint({
+    mini_u()
+  })
+
+  output$update_balance <- shiny::renderPrint({
+    balance(mini_u())
+  })
+
+  update_plots <- shiny::reactive({
+    plot(mini_u(), show.plots = FALSE)
+  })
+
+  output$update_plot <- shiny::renderPlot({
+    ggpubr::ggarrange(plotlist = update_plots(), ncol = 1)
+  })
 
   session$onSessionEnded(stopApp)
 
