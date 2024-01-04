@@ -12,6 +12,11 @@
 #' @returns (Invisibly) the data.frame of all participants with group existing
 #'   and new group allocations
 #'
+#' @section Warning:
+#' `update` does not currently support stratification, if the original
+#' minimisation object given uses minimisation then it will be ignored and a
+#' warning will be given.
+#'
 #' @seealso [update()] for the generic function
 #'
 #' @examples
@@ -37,11 +42,12 @@ update.mini <- function(object, new.data, ...) {
             "overwritten", call. = F)
   }
 
+  if(!is.null(strata(object))) {
+    warning("The original minimisation used stratification, this is not yet ",
+            "supported in `update` and will be ignored.", call. = F)
+  }
+
   new.data$Group <- NA
-
-
-
-  # TODO add check for stratification - with warning that it will be ignored
 
   out <- dplyr::bind_rows(as.data.frame(object), new.data)
 

@@ -22,6 +22,13 @@ and new group allocations
 existing group allocations and factor information to allocate the new
 participants using minimisation.
 }
+\section{Warning}{
+
+\code{update} does not currently support stratification, if the original
+minimisation object given uses minimisation then it will be ignored and a
+warning will be given.
+}
+
 \examples{
 mini <- minimise(patients, groups = 3, factors = c("sex", "stage"),
                  burnin = 10)
