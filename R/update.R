@@ -8,6 +8,7 @@
 #' @param new.data a `data.frame` object with one line per new participant and
 #'                 columns for the minimisation factors. Must be of the same
 #'                 format as the `data.frame` in `object` (minus `Group`)
+#' @param ... unused arguments passed to `update.default()`
 #'
 #' @returns (Invisibly) the data.frame of all participants with group existing
 #'   and new group allocations

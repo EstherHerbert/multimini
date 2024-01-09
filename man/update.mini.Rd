@@ -12,6 +12,8 @@
 \item{new.data}{a \code{data.frame} object with one line per new participant and
 columns for the minimisation factors. Must be of the same
 format as the \code{data.frame} in \code{object} (minus \code{Group})}
+
+\item{...}{unused arguments passed to \code{update.default()}}
 }
 \value{
 (Invisibly) the data.frame of all participants with group existing
