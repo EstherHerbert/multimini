@@ -58,11 +58,17 @@ update.mini <- function(object, new.data, ...) {
     set.seed(seed(object))
   }
 
+  if(is.factor(object$Group)) {
+    groups <- levels(object$Group)
+  } else {
+    groups <- 1:groups(object)
+  }
+
   burnin.remaining <- min(burnin(object) - nrow(object), nrow(new.data))
 
   if(burnin.remaining > 0) {
     out$Group[(nrow(object) + 1):(nrow(object) + burnin.remaining)] <-
-      sample(1:groups(object), burnin.remaining, replace = T,
+      sample(groups, burnin.remaining, replace = T,
              prob = ratio(object)/sum(ratio(object)))
   } else {
     burnin.remaining <- 0
@@ -99,7 +105,7 @@ update.mini <- function(object, new.data, ...) {
         probs <- minprob(object)[rank(scores)]
       }
 
-      out$Group[i] <- sample(1:groups(object), 1, replace = T, prob = probs)
+      out$Group[i] <- sample(groups, 1, replace = T, prob = probs)
 
     }
   }
