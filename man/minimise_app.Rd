@@ -4,12 +4,7 @@
 \alias{minimise_app}
 \title{App interface for the multimini package}
 \usage{
-minimise_app(data, ...)
-}
-\arguments{
-\item{data}{patient data}
-
-\item{...}{options passed to \code{shiny::shinyApp()}}
+minimise_app()
 }
 \description{
 App interface for the multimini package

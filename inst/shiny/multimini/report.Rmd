@@ -1,0 +1,18 @@
+---
+title: "Minimisation report"
+output: html_document
+params:
+  mini: NA
+  plots: NA
+---
+
+
+```{r, echo=FALSE}
+params$mini
+
+balance(params$mini)
+```
+
+```{r, echo=FALSE}
+ggpubr::ggarrange(plotlist = params$plots, ncol = 1)
+```
