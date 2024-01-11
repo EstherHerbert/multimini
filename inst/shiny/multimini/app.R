@@ -1,50 +1,95 @@
-ui <- shiny::fluidPage(
+# UI ---------------------------------------------------------------------------
+ui <- shiny::navbarPage(
+  title = "Multi Arm Minimisation",
 
-  rclipboard::rclipboardSetup(),
+  # Initialise -----------------------------------------------------------------
 
-  shiny::titlePanel("Multi Arm Minimisation"),
+  tabPanel(
+    title = "Initialise",
+    shiny::fluidPage(
 
-  shiny::sidebarLayout(
+      rclipboard::rclipboardSetup(),
 
-    shiny::sidebarPanel(
-      shiny::fileInput("data", "Participant Data"),
-      shiny::numericInput("groups", "Number of groups", value = 3, min = 2),
-      shiny::checkboxInput("names", "Give group names?"),
-      shiny::uiOutput("groupnamesInput"),
-      shiny::selectInput("factors", "Factor variable(s)", choices = NULL,
-                         multiple = T),
-      shiny::numericInput("burnin", "Length of burnin period", min = 1,
-                          value = 10),
-      shiny::numericInput("minprob1", "Minimisation probabilities", min = 0,
-                          max = 1, value = 0.8, step = 0.1),
-      shiny::uiOutput("minprobInput"),
-      shiny::numericInput("ratio1", "Ratios", min = 1, value = 1,
-                          step = 1),
-      shiny::uiOutput("ratioInput"),
-      shiny::checkboxInput("stratify", "Stratify minimisation?"),
-      shiny::uiOutput("stratifyInput"),
-      shiny::checkboxInput("seed", "Set seed?"),
-      shiny::uiOutput("seedInput"),
-      shiny::actionButton("minimise", "Minimise"),
-      shiny::tags$br(),
-      shiny::tags$br(),
-      shiny::actionButton("code", label = "Generate Code",
-                          icon = shiny::icon(name = "code")),
-      shiny::downloadButton("download", label = "Download allocations"),
-      shiny::downloadButton("report", label = "Download report")
-    ),
+      shiny::sidebarLayout(
 
-    shiny::mainPanel(
-      shiny::verbatimTextOutput("minimise"),
-      shiny::verbatimTextOutput("balance"),
-      shiny::plotOutput("plot"),
-      shiny::uiOutput("clip"),
-      shiny::verbatimTextOutput("code")
+        shiny::sidebarPanel(
+          shiny::fileInput("data", "Participant Data"),
+          shiny::numericInput("groups", "Number of groups", value = 3, min = 2),
+          shiny::checkboxInput("names", "Give group names?"),
+          shiny::uiOutput("groupnamesInput"),
+          shiny::selectInput("factors", "Factor variable(s)", choices = NULL,
+                             multiple = T),
+          shiny::numericInput("burnin", "Length of burnin period", min = 1,
+                              value = 10),
+          shiny::numericInput("minprob1", "Minimisation probabilities", min = 0,
+                              max = 1, value = 0.8, step = 0.1),
+          shiny::uiOutput("minprobInput"),
+          shiny::numericInput("ratio1", "Ratios", min = 1, value = 1,
+                              step = 1),
+          shiny::uiOutput("ratioInput"),
+          shiny::checkboxInput("stratify", "Stratify minimisation?"),
+          shiny::uiOutput("stratifyInput"),
+          shiny::checkboxInput("seed", "Set seed?"),
+          shiny::uiOutput("seedInput"),
+          shiny::actionButton("minimise", "Minimise"),
+          shiny::tags$br(),
+          shiny::tags$br(),
+          shiny::actionButton("code", label = "Generate Code",
+                              icon = shiny::icon(name = "code")),
+          shiny::downloadButton("download", label = "Download allocations",
+                                icon = shiny::icon(name = "file-csv")),
+          shiny::downloadButton("downloadRData", label = "Download R object"),
+          shiny::downloadButton("report", label = "Download report",
+                                icon = shiny::icon(name = "file"))
+        ),
+
+        shiny::mainPanel(
+          shiny::verbatimTextOutput("minimise"),
+          shiny::verbatimTextOutput("balance"),
+          shiny::plotOutput("plot"),
+          shiny::uiOutput("clip"),
+          shiny::verbatimTextOutput("code")
+        )
+      )
+    )
+  ),
+
+  # Update ---------------------------------------------------------------------
+
+  tabPanel(
+    title = "Update",
+    shiny::fluidPage(
+      shiny::sidebarLayout(
+        shiny::sidebarPanel(
+          shiny::fileInput("data.mini", "Minimisation to update",
+                           accept = ".rds"),
+          shiny::radioButtons("new.format", "New patients",
+                              choices = c("As .csv", "Input factors")),
+          shiny::uiOutput("new.dataInput"),
+          shiny::actionButton("update", "Update minimisation"),
+          shiny::downloadButton("update_download",
+                                label = "Download allocations",
+                                icon = shiny::icon(name = "file-csv")),
+          shiny::downloadButton("update_downloadRData",
+                                label = "Download R object"),
+          shiny::downloadButton("update_report", label = "Download report",
+                                icon = shiny::icon(name = "file"))
+        ),
+        shiny::mainPanel(
+          shiny::verbatimTextOutput("update"),
+          shiny::verbatimTextOutput("update_balance"),
+          shiny::plotOutput("update_plot"),
+        )
+      )
     )
   )
 )
 
+# Server -----------------------------------------------------------------------
+
 server <- function(input, output, session) {
+
+  # Initialise -----------------------------------------------------------------
 
   data <- shiny::reactive({
     shiny::req(input$data)
@@ -210,6 +255,14 @@ server <- function(input, output, session) {
     }
   )
 
+  output$downloadRData <- downloadHandler(
+    filename = "minimise.rds",
+    content = function(file) {
+      df <- mini()
+      saveRDS(df, file = file)
+    }
+  )
+
   output$report <- downloadHandler(
     filename = "report.html",
     content = function(file) {
@@ -223,6 +276,98 @@ server <- function(input, output, session) {
 
       # Set up parameters to pass to Rmd document
       params <- list(mini = mini(), plots = plots())
+
+      # Knit the document, passing in the `params` list, and eval it in a
+      # child of the global environment (this isolates the code in the document
+      # from the code in this app).
+      rmarkdown::render(tempReport, output_file = file,
+                        params = params,
+                        envir = new.env(parent = globalenv())
+      )
+    }
+  )
+
+  # Update ---------------------------------------------------------------------
+
+  data.mini <- shiny::reactive({
+    shiny::req(input$data.mini)
+    readRDS(input$data.mini$datapath)
+  })
+
+  output$new.dataInput <- shiny::renderUI({
+    switch(
+      input$new.format,
+      "As .csv" = shiny::fileInput("new.data", "New patients to minimise",
+                                   accept = ".csv"),
+      "Input factors" = lapply(factors(data.mini()), function(i) {
+        shiny::textInput(paste0("factor.", i), label = i)
+      })
+    )
+  })
+
+  new.data <- shiny::reactive({
+    shiny::req(input$new.format)
+    switch(
+      input$new.format,
+      "As .csv" = read.csv(input$new.data$datapath),
+      "Input factors" =
+        dplyr::bind_rows(sapply(factors(data.mini()),
+                             function(i) input[[paste0("factor.", i)]]))
+    )
+  })
+
+  mini_u <- shiny::eventReactive(input$update, {
+    shiny::req(input$data.mini, new.data())
+    update(data.mini(), new.data())
+  })
+
+  output$update <- shiny::renderPrint({
+    mini_u()
+  })
+
+  output$update_balance <- shiny::renderPrint({
+    balance(mini_u())
+  })
+
+  update_plots <- shiny::reactive({
+    plot(mini_u(), show.plots = FALSE)
+  })
+
+  output$update_plot <- shiny::renderPlot({
+    ggpubr::ggarrange(plotlist = update_plots(), ncol = 1)
+  })
+
+  output$update_download <- shiny::downloadHandler(
+    filename = function() {
+      paste0("update_minimise_", format(Sys.time(), "%Y%m%d"), ".csv")
+    },
+    content = function(file) {
+      write.csv(mini_u(), file, row.names = FALSE)
+    }
+  )
+
+  output$update_downloadRData <- downloadHandler(
+    filename = "update_minimise.rds",
+    content = function(file) {
+      df <- mini_u()
+      saveRDS(df, file = file)
+    }
+  )
+
+
+  output$update_report <- downloadHandler(
+    filename = "update_report.html",
+    content = function(file) {
+      # Copy the report file to a temporary directory before processing it, in
+      # case we don't have write permissions to the current working dir (which
+      # can happen when deployed).
+      tempReport <- file.path(tempdir(), "report.Rmd")
+      file.copy(system.file("shiny", "multimini", "report.Rmd",
+                            package = "multimini"),
+                tempReport, overwrite = TRUE)
+
+      # Set up parameters to pass to Rmd document
+      params <- list(mini = mini_u(), plots = update_plots())
 
       # Knit the document, passing in the `params` list, and eval it in a
       # child of the global environment (this isolates the code in the document

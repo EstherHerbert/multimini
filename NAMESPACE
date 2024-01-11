@@ -3,6 +3,7 @@
 S3method(plot,mini)
 S3method(print,balance.mini)
 S3method(print,mini)
+S3method(update,mini)
 export(balance)
 export(minimise)
 export(minimise_app)
