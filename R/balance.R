@@ -34,7 +34,8 @@ balance <- function(object) {
     imbalance[i] <- sum(apply(temp, 1, stats::sd))
   }
 
-  imbalance <- sum(imbalance)
+  # this currently assumes equal weight for each factor
+  imbalance <- mean(imbalance)
 
   out <- list(factor_balance = f_tab, imbalance = imbalance)
 
