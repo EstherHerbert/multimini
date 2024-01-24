@@ -10,7 +10,6 @@ minimise(
   factors,
   burnin = 10,
   minprob = c(0.8, rep(0.2/(groups - 1), groups - 1)),
-  stratify = NULL,
   ratio = rep(1, groups),
   group.names = NULL,
   seed = NULL
@@ -25,18 +24,12 @@ for the minimisation factors.}
 \item{factors}{a character vector with the factors for minimisation}
 
 \item{burnin}{an integer, the burnin length before minimisation kicks in,
-default is 10. Must be >0 and < total sample size. When using
-stratification burnin must be smaller than the smallest strata
-size.}
+default is 10. Must be >0 and < total sample size.}
 
 \item{minprob}{a vector of the same length as \code{groups} with the minimisation
 probabilities. The default is to give 0.8 probability to the
 group which would lead to the least imbalance and to allocate
 the remaining probability equally to the other groups.}
-
-\item{stratify}{if stratification is to be used then a character string
-specifying the name of the stratification variable (e.g.,
-"site"). Default is \code{NULL} for no stratification.}
 
 \item{ratio}{a numeric vector of randomisation ratios (must be of length
 equal to the number of groups)}
@@ -48,8 +41,8 @@ the same length as \code{groups}.}
 offsetting the random number generator.}
 }
 \value{
-(Invisibly) the data.frame with an additional column \code{Group} indicating
-numerically which group has been allocated.
+(Invisibly) the data.frame with an additional column \code{Group}
+indicating numerically which group has been allocated.
 }
 \description{
 \code{minimise} randomises patients in a data frame using minimisation
@@ -63,12 +56,8 @@ numerically which group has been allocated.
 # View data with group info
 as.data.frame(mini)
 
-# Stratify minimisation by site
-minimise(patients, groups = 3, factors = c("sex", "stage"), burnin = 5,
-         stratify = "site")
-
 # Use 2:1:1 ratio
 minimise(patients, groups = 3, factors = c("sex", "stage"), burnin = 5,
-         stratify = "site", ratio = c(2,1,1))
+         ratio = c(2,1,1))
 
 }

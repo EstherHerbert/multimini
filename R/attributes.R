@@ -34,15 +34,6 @@ minprob <- function(x) {
   return(x)
 }
 
-strata <- function(x) {
-  return(attr(x, "strata"))
-}
-
-`strata<-` <- function(x, value) {
-  attr(x, "strata") <- value
-  return(x)
-}
-
 ratio <- function(x) {
   return(attr(x, "ratio"))
 }

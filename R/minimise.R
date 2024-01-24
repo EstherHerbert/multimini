@@ -7,16 +7,11 @@
 #' @param groups an integer, the number of groups to randomise to, default is 3
 #' @param factors a character vector with the factors for minimisation
 #' @param burnin an integer, the burnin length before minimisation kicks in,
-#'               default is 10. Must be >0 and < total sample size. When using
-#'               stratification burnin must be smaller than the smallest strata
-#'               size.
+#'               default is 10. Must be >0 and < total sample size.
 #' @param minprob a vector of the same length as `groups` with the minimisation
 #'                probabilities. The default is to give 0.8 probability to the
 #'                group which would lead to the least imbalance and to allocate
 #'                the remaining probability equally to the other groups.
-#' @param stratify if stratification is to be used then a character string
-#'                 specifying the name of the stratification variable (e.g.,
-#'                 "site"). Default is `NULL` for no stratification.
 #' @param ratio a numeric vector of randomisation ratios (must be of length
 #'              equal to the number of groups)
 #' @param group.names optional, a character vector with the group names, must be
@@ -24,8 +19,8 @@
 #' @param seed optional, an integer that is used with `set.seed()` for
 #'             offsetting the random number generator.
 #'
-#' @returns (Invisibly) the data.frame with an additional column `Group` indicating
-#'   numerically which group has been allocated.
+#' @returns (Invisibly) the data.frame with an additional column `Group`
+#'   indicating numerically which group has been allocated.
 #'
 #' @examples
 #' # Minimisation to 3 groups, with two factors and a burnin of 15, using the
@@ -36,19 +31,14 @@
 #' # View data with group info
 #' as.data.frame(mini)
 #'
-#' # Stratify minimisation by site
-#' minimise(patients, groups = 3, factors = c("sex", "stage"), burnin = 5,
-#'          stratify = "site")
-#'
 #' # Use 2:1:1 ratio
 #' minimise(patients, groups = 3, factors = c("sex", "stage"), burnin = 5,
-#'          stratify = "site", ratio = c(2,1,1))
+#'          ratio = c(2,1,1))
 #'
 #' @export
 minimise <- function(data, groups = 3, factors, burnin = 10,
                      minprob = c(0.8, rep(0.2/(groups - 1), groups - 1)),
-                     stratify = NULL, ratio = rep(1, groups),
-                     group.names = NULL, seed = NULL){
+                     ratio = rep(1, groups), group.names = NULL, seed = NULL){
 
   # Check inputs
   if(groups < 2) {
@@ -65,13 +55,6 @@ minimise <- function(data, groups = 3, factors, burnin = 10,
   if(!all(factors %in% names(data)))
     stop("The factors must be variables in the provided data")
 
-  if(!is.null(stratify)) {
-    if(!stratify %in% names(data)) {
-      stop(paste("stratify must either be NULL (for no stratification) or a",
-                 "variable provided in the data"))
-    }
-  }
-
   if(length(ratio) != groups) {
     stop("ratio should have length equal to the number of groups.")
   }
@@ -79,6 +62,10 @@ minimise <- function(data, groups = 3, factors, burnin = 10,
   if(burnin == 0) {
     warning("Burnin must be greater than 0, it has been updated to 1.")
     burnin <- 1
+  }
+
+  if(burnin >= nrow(data)) {
+    stop("Specified burnin must be less than the sample size")
   }
 
   if(!is.null(group.names)) {
@@ -94,66 +81,47 @@ minimise <- function(data, groups = 3, factors, burnin = 10,
 
   out$Group <- rep(NA, sampsize)
 
-  if (!is.null(stratify)) {
-    out <- split(out, out[, stratify])
-  } else {
-    out <- list(out)
+  if(!is.null(seed)) {
+    set.seed(seed)
   }
 
-  for(s in 1:length(out)) {
+  out$Group[1:burnin] <- sample(1:groups, burnin, replace = T,
+                                prob = ratio/sum(ratio))
 
-    if(!is.null(seed)) {
-      set.seed(seed)
-    }
+  # Minimisation
+  for(i in (burnin + 1):sampsize){
 
-    sampsize <- nrow(out[[s]])
-    # Burn-in phase
-    if(burnin >= sampsize) {
-      stop(paste0("Specified burnin must be less than the smallest strata",
-                  "size (", min(sapply(out, nrow)), ")."))
-    }
+    c_factors <- out[i,] # new participant
+    p_factors <- utils::head(out, i-1) # previous participants
 
-    out[[s]]$Group[1:burnin] <- sample(1:groups, burnin, replace = T,
-                                       prob = ratio/sum(ratio))
-
-    # Minimisation
-    for(i in (burnin + 1):sampsize){
-
-      c_factors <- out[[s]][i,] # new participant
-      p_factors <- utils::head(out[[s]], i-1) # previous participants
-
-      counts <- matrix(NA, n.factors, groups)
-      for (j in 1:n.factors) {
-        for (k in 1:groups) {
-          factor <- factors[j]
-          counts[j,k] <- sum(p_factors[,factor] == c_factors[,factor] &
-                               p_factors$Group == k)
-        }
-      }; rm(j, k)
-
-      scores <- rep(NA, groups)
-      for (j in 1:groups) {
-        temp <- counts
-        temp[, j] <- temp[, j] + 1
-        num_level <- temp %*% diag(1/ratio)
-        sd_level <- apply(num_level, 1, stats::sd)
-        scores[j] <- sum(sd_level)
+    counts <- matrix(NA, n.factors, groups)
+    for (j in 1:n.factors) {
+      for (k in 1:groups) {
+        factor <- factors[j]
+        counts[j,k] <- sum(p_factors[,factor] == c_factors[,factor] &
+                             p_factors$Group == k)
       }
+    }; rm(j, k)
 
-
-      if (stats::var(scores) == 0) { # i.e., if they're all equal
-        probs <- rep(1/groups, groups)
-      } else {
-        probs <- minprob[rank(scores)]
-      }
-
-      out[[s]]$Group[i] <- sample(1:groups, 1, replace = T, prob = probs)
-
+    scores <- rep(NA, groups)
+    for (j in 1:groups) {
+      temp <- counts
+      temp[, j] <- temp[, j] + 1
+      num_level <- temp %*% diag(1/ratio)
+      sd_level <- apply(num_level, 1, stats::sd)
+      scores[j] <- sum(sd_level)
     }
+
+
+    if (stats::var(scores) == 0) { # i.e., if they're all equal
+      probs <- rep(1/groups, groups)
+    } else {
+      probs <- minprob[rank(scores)]
+    }
+
+    out$Group[i] <- sample(1:groups, 1, replace = T, prob = probs)
+
   }
-
-  out <- do.call(rbind, out)
-  row.names(out) <- NULL
 
   if(!is.null(group.names)) {
     out$Group <- factor(out$Group, levels = 1:groups, labels = group.names)
@@ -164,7 +132,6 @@ minimise <- function(data, groups = 3, factors, burnin = 10,
   factors(out) <- factors
   burnin(out) <- burnin
   minprob(out) <- minprob
-  strata(out) <- stratify
   ratio(out) <- ratio
   seed(out) <- seed
 
@@ -183,9 +150,6 @@ print.mini <- function(x, ...){
   cat("Number of groups:", groups(x), "\n")
   cat("Randomisation ratio:", paste(ratio(x), collapse = ":"), "\n")
   cat("Factors:", paste(factors(x), collapse = ", "), "\n")
-  if (!is.null(strata(x))) {
-    cat("Stratified by:", strata(x), "\n")
-  }
   cat("Burnin:", burnin(x), "\n")
   cat("Minimisation probabilities:",
       paste(round(minprob(x), 2), collapse = ", "), "\n")
@@ -224,19 +188,6 @@ plot.mini <- function(x, show.plots = TRUE, ...) {
                   y = "Count", fill = "Group") +
     ggplot2::theme_bw() +
     ggplot2::theme(legend.position = "bottom")
-
-  if(!is.null(strata(x))) {
-    out$strata <- out[,strata(x)]
-    plots$strata <-
-      ggplot2::ggplot(out, ggplot2::aes(factor(strata), fill = Group,
-                                        group = Group)) +
-      ggplot2::geom_bar(position = "dodge") +
-      ggplot2::annotate("label", x = Inf, y = Inf, label = ratio, vjust = 1.5,
-                        hjust = 1.5) +
-      ggplot2::labs(x = paste("Strata:", strata(x)), y = "Count", fill = "Group") +
-      ggplot2::theme_bw() +
-      ggplot2::theme(legend.position = "bottom")
-  }
 
   if(show.plots) {
     print(plots[[1]])
