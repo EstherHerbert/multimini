@@ -27,8 +27,6 @@ ui <- shiny::navbarPage(
           shiny::numericInput("ratio1", "Ratios", min = 1, value = 1,
                               step = 1),
           shiny::uiOutput("ratioInput"),
-          shiny::checkboxInput("stratify", "Stratify minimisation?"),
-          shiny::uiOutput("stratifyInput"),
           shiny::checkboxInput("seed", "Set seed?"),
           shiny::uiOutput("seedInput"),
           shiny::actionButton("minimise", "Minimise"),
@@ -124,13 +122,6 @@ server <- function(input, output, session) {
     })
   })
 
-  output$stratifyInput <- shiny::renderUI({
-    if(input$stratify) {
-      shiny::selectInput("stratvar", "Stratification variable",
-                         choices = names(data()))
-    }
-  })
-
   output$seedInput <- shiny::renderUI({
     if(input$seed) {
       shiny::numericInput("seed.n", NULL, value = NULL)
@@ -148,11 +139,7 @@ server <- function(input, output, session) {
     minprob <- sapply(1:input$groups,
                       function(i) input[[paste0("minprob", i)]])
     ratio <- sapply(1:input$groups, function(i) input[[paste0("ratio", i)]])
-    if(input$stratify) {
-      stratvar <- input$stratvar
-    } else {
-      stratvar <- NULL
-    }
+
     if(input$seed) {
       seed.n <- input$seed.n
     } else {
@@ -161,7 +148,7 @@ server <- function(input, output, session) {
 
     minimise(data(), groups = input$groups, factors = input$factors,
              burnin = input$burnin, minprob = minprob, ratio = ratio,
-             stratify = stratvar, group.names = names, seed = seed.n)
+             group.names = names, seed = seed.n)
   })
 
   output$minimise <- shiny::renderPrint({
@@ -196,12 +183,6 @@ server <- function(input, output, session) {
     ratio <- sapply(1:input$groups, function(i) input[[paste0("ratio", i)]])
     ratio <- paste(ratio, collapse = ", ")
 
-    if(input$stratify) {
-      stratvar <- paste0("\"", input$stratvar, "\"")
-    } else {
-      stratvar <- "NULL"
-    }
-
     if(input$seed) {
       seed.n <- input$seed.n
     } else {
@@ -222,7 +203,6 @@ server <- function(input, output, session) {
       "burnin = ", input$burnin, ", ",
       "minprob = c(", minprob, "), ",
       "ratio = c(", ratio, ")",
-      ifelse(input$stratify, paste0(", stratify = ", stratvar), ""),
       ifelse(input$names, paste0(", group.names = ", names), ""),
       ifelse(input$seed, paste0(", seed = ", seed.n), ""),
       ")\n",

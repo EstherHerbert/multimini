@@ -47,15 +47,6 @@ balance(mini)
 balance(mini)
 ```
 
-### Using stratification
-
-``` r
-(mini_s <- minimise(patients, groups = 3, factors = c("sex", "stage"),
-                    burnin = 5, stratify = "site"))
-
-balance(mini_s)
-```
-
 ### Updating the miniisation
 
 ``` r
