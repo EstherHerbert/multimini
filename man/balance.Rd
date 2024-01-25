@@ -21,9 +21,5 @@ mini <- minimise(patients, groups = 3, factors = c("sex", "stage"),
                  burnin = 15)
 
 balance(mini)
-# When stratification is used `balance` gives the balance across strata too
-mini <- minimise(patients, groups = 3, factors = c("sex", "stage"),
-                 burnin = 5, stratify = "site")
-balance(mini)
 
 }

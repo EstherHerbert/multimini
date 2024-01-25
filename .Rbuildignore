@@ -5,3 +5,5 @@
 ^\.git$
 ^README\.Rmd$
 ^logo$
+^rsconnect$
+^\.app.R$

@@ -12,10 +12,6 @@
 #'                  burnin = 15)
 #'
 #' balance(mini)
-#' # When stratification is used `balance` gives the balance across strata too
-#' mini <- minimise(patients, groups = 3, factors = c("sex", "stage"),
-#'                  burnin = 5, stratify = "site")
-#' balance(mini)
 #'
 #' @export
 balance <- function(object) {
@@ -34,16 +30,10 @@ balance <- function(object) {
     imbalance[i] <- sum(apply(temp, 1, stats::sd))
   }
 
+  # this currently assumes equal weight for each factor
   imbalance <- sum(imbalance)
 
   out <- list(factor_balance = f_tab, imbalance = imbalance)
-
-  # Balance across strata
-  if(!is.null(strata(object))) {
-    s_tab <- table(object[,c("Group", strata(object))])
-    out <- c(out, strata_balance = list(s_tab))
-    strata(out) <- strata(object)
-  }
 
   class(out) <- "balance.mini"
   groups(out) <- groups(object)
@@ -62,18 +52,9 @@ print.balance.mini <- function(x, ...) {
     f_temp[[i]] <- knitr::kable(x$factor_balance[[i]], format = "markdown")
   }
 
-  if(!is.null(strata(x))) {
-    s_temp <- knitr::kable(x$strata_balance, format = "markdown")
-  }
-
   cat("Balance of factors (", paste(factors(x), collapse = ", "), ") over ",
       groups(x), " groups (", paste(ratio(x), collapse = ":"), ")\n", sep = "")
   cat(rep("-", 80), "\n", sep = "")
   cat(do.call("paste", c(f_temp, sep = "    ")), sep = "\n")
-  if(!is.null(strata(x))) {
-    cat("\nBalance of strata (", strata(x), ")\n", sep = "")
-    cat(rep("-", 80), "\n", sep = "")
-    cat(s_temp, sep = "\n")
-  }
   cat("\nTotal imbalance:", round(x$imbalance, 3))
 }
