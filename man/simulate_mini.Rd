@@ -11,7 +11,6 @@ simulate_mini(
   factors,
   burnin,
   minprob,
-  stratify = NULL,
   ratio = rep(1, groups)
 )
 }
@@ -29,14 +28,10 @@ minimisation}
 
 \item{burnin}{a vector of integers of possible burnin lengths before
 minimisation kicks in. Individual values must be > 0 and
-< total sample size. When using stratification burnin must be
-smaller than the smallest strata size.}
+< total sample size.}
 
 \item{minprob}{a list of vectors (each of the same length as \code{groups}) with
 the possible minimisation probabilities.}
-
-\item{stratify}{a list of stratification options, see \code{\link[=minimise]{minimise()}} for more
-information.}
 
 \item{ratio}{a numeric vector of randomisation ratios (must be of length
 equal to the number of groups).}

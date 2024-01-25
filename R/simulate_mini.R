@@ -14,45 +14,31 @@
 #'                minimisation
 #' @param burnin a vector of integers of possible burnin lengths before
 #'               minimisation kicks in. Individual values must be > 0 and
-#'               < total sample size. When using stratification burnin must be
-#'               smaller than the smallest strata size.
+#'               < total sample size.
 #' @param minprob a list of vectors (each of the same length as `groups`) with
 #'                the possible minimisation probabilities.
-#' @param stratify a list of stratification options, see [minimise()] for more
-#'                 information.
 #' @param ratio a numeric vector of randomisation ratios (must be of length
 #'              equal to the number of groups).
 #'
 #' @export
 simulate_mini <- function(data, Nsims = 100, groups = 3, factors, burnin, minprob,
-                          stratify = NULL, ratio = rep(1, groups)) {
+                          ratio = rep(1, groups)) {
 
   if(any(!unlist(factors) %in% names(data))) {
     stop("Given factors must be variables in the data.")
   }
 
-  if(any(!is.null(stratify))) {
-    if(any(!unlist(stratify) %in% names(data))) {
-      stop("`stratify` must be either NULL or a variable in the data.")
-    }
-  }
-
-  if(is.null(stratify)) {
-    stratify <- list(NULL)
-  }
-
   inputs <- expand.grid(sim.no = 1:Nsims,
                         factors = factors,
                         burnin = burnin,
-                        minprob = minprob,
-                        stratify = stratify)
+                        minprob = minprob)
 
   minimise_s <- purrr::possibly(minimise, otherwise = NA)
 
   sims <- mapply(
     function(x, y, z, w) minimise_s(data, factors = z, burnin = x,
-                                    minprob = y, stratify = w, ratio = ratio),
-    inputs$burnin, inputs$minprob, inputs$factors, inputs$stratify,
+                                    minprob = y, ratio = ratio),
+    inputs$burnin, inputs$minprob, inputs$factors,
     SIMPLIFY = FALSE
   )
 
@@ -64,8 +50,6 @@ simulate_mini <- function(data, Nsims = 100, groups = 3, factors, burnin, minpro
 
   inputs$minprob <- sapply(inputs$minprob, paste, collapse = ", ")
   inputs$factors <- sapply(inputs$factors, paste, collapse = ", ")
-  inputs$stratify[sapply(inputs$stratify, is.null)] <- "NULL"
-  inputs$stratify <- unlist(inputs$stratify)
 
   inputs <- inputs[!is.na(sims),]
   sims <- sims[!is.na(sims)]
@@ -89,10 +73,10 @@ print.mini.sim <- function(x, ...) {
   temp$imbalance <- x$imbalance
   temp$groups <- x$group.sizes
 
-  tab_imb <- stats::aggregate(imbalance ~ factors + burnin + minprob + stratify,
+  tab_imb <- stats::aggregate(imbalance ~ factors + burnin + minprob ,
                               data=temp, FUN = function(x) round(mean(x), 1))
 
-  tab_grp <- stats::aggregate(groups ~ factors + burnin + minprob + stratify,
+  tab_grp <- stats::aggregate(groups ~ factors + burnin + minprob,
                               data=temp, FUN = function(x) round(mean(x), 1))
 
   cat("Simulation of Multi-arm Minimisation \n")
@@ -102,8 +86,6 @@ print.mini.sim <- function(x, ...) {
   cat("Burnin options:", paste(unique(x$inputs$burnin), collapse = ", "), "\n")
   cat("Minimisation probability options:",
       paste(unique(x$inputs$minprob), ncollapse = "; "), "\n")
-  cat("Stratification options:",
-      paste(unique(x$inputs$stratify), collapse = ", "), "\n")
   cat("Average group sizes:\n")
   cat(knitr::kable(tab_grp, format = "markdown"), sep = "\n")
   cat("Average imbalance:\n")
