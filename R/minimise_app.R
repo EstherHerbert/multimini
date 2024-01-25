@@ -96,7 +96,7 @@ minimise_app <- function() {
 
     data <- shiny::reactive({
       shiny::req(input$data)
-      read.csv(input$data$datapath)
+      utils::read.csv(input$data$datapath)
     })
 
     output$groupnamesInput <- shiny::renderUI({
@@ -236,11 +236,11 @@ minimise_app <- function() {
         paste0("minimise_", format(Sys.time(), "%Y%m%d"), ".csv")
       },
       content = function(file) {
-        write.csv(mini(), file, row.names = FALSE)
+        utils::write.csv(mini(), file, row.names = FALSE)
       }
     )
 
-    output$downloadRData <- downloadHandler(
+    output$downloadRData <- shiny::downloadHandler(
       filename = "minimise.rds",
       content = function(file) {
         df <- mini()
@@ -248,7 +248,7 @@ minimise_app <- function() {
       }
     )
 
-    output$report <- downloadHandler(
+    output$report <- shiny::downloadHandler(
       filename = "report.html",
       content = function(file) {
         # Copy the report file to a temporary directory before processing it, in
@@ -294,7 +294,7 @@ minimise_app <- function() {
       shiny::req(input$new.format)
       switch(
         input$new.format,
-        "As .csv" = read.csv(input$new.data$datapath),
+        "As .csv" = utils::read.csv(input$new.data$datapath),
         "Input factors" =
           dplyr::bind_rows(sapply(factors(data.mini()),
                                   function(i) input[[paste0("factor.", i)]]))
@@ -303,7 +303,7 @@ minimise_app <- function() {
 
     mini_u <- shiny::eventReactive(input$update, {
       shiny::req(input$data.mini, new.data())
-      update(data.mini(), new.data())
+      update.mini(data.mini(), new.data())
     })
 
     output$update <- shiny::renderPrint({
@@ -327,11 +327,11 @@ minimise_app <- function() {
         paste0("update_minimise_", format(Sys.time(), "%Y%m%d"), ".csv")
       },
       content = function(file) {
-        write.csv(mini_u(), file, row.names = FALSE)
+        utils::write.csv(mini_u(), file, row.names = FALSE)
       }
     )
 
-    output$update_downloadRData <- downloadHandler(
+    output$update_downloadRData <- shiny::downloadHandler(
       filename = "update_minimise.rds",
       content = function(file) {
         df <- mini_u()
@@ -340,7 +340,7 @@ minimise_app <- function() {
     )
 
 
-    output$update_report <- downloadHandler(
+    output$update_report <- shiny::downloadHandler(
       filename = "update_report.html",
       content = function(file) {
         # Copy the report file to a temporary directory before processing it, in
@@ -364,7 +364,7 @@ minimise_app <- function() {
       }
     )
 
-    session$onSessionEnded(stopApp)
+    session$onSessionEnded(shiny::stopApp)
 
   }
 
