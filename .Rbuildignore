@@ -6,4 +6,4 @@
 ^README\.Rmd$
 ^logo$
 ^rsconnect$
-^\.app.R$
+^app\.R$
