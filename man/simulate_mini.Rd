@@ -45,3 +45,14 @@ different specified burnin periods and/or minimisation probabilities. Its
 purpose is to guide decisions when designing a randomisation strategy for a
 randomised controlled trial.
 }
+\examples{
+simulate_mini(sampsize = 150,
+              factors = list(sex = list(levels = c("M", "F"),
+                                        props = c(0.5, 0.5)),
+                             site = list(levels = 12,
+                                         prop.dist = c(mean = 0.1, sd = 0.05))),
+              Nsims = 10, groups = 3, burnin = c(10, 15),
+              minprob = list(c(0.8, 0.1, 0.1), c(0.8, 0.15, 0.05)),
+              ratio = c(1,1,1))
+
+}

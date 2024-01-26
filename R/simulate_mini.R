@@ -23,6 +23,16 @@
 #' @param ratio a numeric vector of randomisation ratios (must be of length
 #'              equal to the number of groups).
 #'
+#' @examples
+#' simulate_mini(sampsize = 150,
+#'               factors = list(sex = list(levels = c("M", "F"),
+#'                                         props = c(0.5, 0.5)),
+#'                              site = list(levels = 12,
+#'                                          prop.dist = c(mean = 0.1, sd = 0.05))),
+#'               Nsims = 10, groups = 3, burnin = c(10, 15),
+#'               minprob = list(c(0.8, 0.1, 0.1), c(0.8, 0.15, 0.05)),
+#'               ratio = c(1,1,1))
+#'
 #' @export
 simulate_mini <- function(sampsize, factors, Nsims = 100, groups = 3, burnin,
                           minprob, ratio = rep(1, groups)) {
