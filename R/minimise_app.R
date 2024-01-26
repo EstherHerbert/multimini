@@ -364,7 +364,7 @@ minimise_app <- function() {
       }
     )
 
-    session$onSessionEnded(stopApp)
+    session$onSessionEnded(shiny::stopApp)
 
   }
 
