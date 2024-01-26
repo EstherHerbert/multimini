@@ -5,26 +5,29 @@
 \title{Simulation of minimisation}
 \usage{
 simulate_mini(
-  data,
+  sampsize,
+  factors,
   Nsims = 100,
   groups = 3,
-  factors,
   burnin,
   minprob,
   ratio = rep(1, groups)
 )
 }
 \arguments{
-\item{data}{a \code{data.frame} object with one line per participant and columns
-for the minimisation factors.}
+\item{sampsize}{the desired sample size of the data, i.e., the sample size
+of your prospective trial.}
+
+\item{factors}{a list of factors, each a list containing two items. The first
+is \code{levels} which is either a vector of the level names OR the number of
+levels. The second item is either \code{props}, a vector of proportions equal to
+the number of levels in the factor; OR prop.dist which is a named vector
+containing the mean and sd of the proportions.}
 
 \item{Nsims}{an integer, the number of simulations to run per scenario,
 default is 100.}
 
 \item{groups}{an integer, the number of groups to randomise, default is 3.}
-
-\item{factors}{a list of character vectors with the names of the factors for
-minimisation}
 
 \item{burnin}{a vector of integers of possible burnin lengths before
 minimisation kicks in. Individual values must be > 0 and
@@ -37,8 +40,8 @@ the possible minimisation probabilities.}
 equal to the number of groups).}
 }
 \description{
-\code{simulate_mini} repeatedly minimises a data set of patients with different
-specified burnin periods and/or minimisation probabilities. Its purpose is to
-guide decisions when designing a randomisation strategy for a randomised
-controlled trial.
+\code{simulate_mini} repeatedly generates random data and then minimises with
+different specified burnin periods and/or minimisation probabilities. Its
+purpose is to guide decisions when designing a randomisation strategy for a
+randomised controlled trial.
 }
