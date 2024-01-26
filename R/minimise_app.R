@@ -85,14 +85,39 @@ minimise_app <- function() {
           )
         )
       )
+    ),
+    # Simulate -----------------------------------------------------------------
+    shiny::tabPanel(
+      title = "Simulate",
+      shiny::fluidPage(
+        shiny::sidebarLayout(
+          shiny::sidebarPanel(
+            shiny::numericInput("sampsize", "Sample Size", value = 100),
+            shiny::textInput("simfactors", "Factors"),
+            shiny::uiOutput("factorInput"),
+            shiny::numericInput("Nsims", "Number of simulations per scenario",
+                                10, min = 1),
+            shiny::numericInput("simgroups", "Number of groups", 3, min = 2),
+            shiny::textInput("simburnin", "Burnin options"),
+            shiny::textInput("simminprob", "Minimisation probability options"),
+            shiny::numericInput("simratio1", "Ratios", min = 1, value = 1,
+                                step = 1),
+            shiny::uiOutput("simratioInput"),
+            shiny::actionButton("simulate", "Run simulations")
+          ),
+          shiny::mainPanel(
+            shiny::verbatimTextOutput("temp")
+          )
+        )
+      )
     )
   )
 
-  # Server -----------------------------------------------------------------------
+  # Server ---------------------------------------------------------------------
 
   server <- function(input, output, session) {
 
-    # Initialise -----------------------------------------------------------------
+    # Initialise ---------------------------------------------------------------
 
     data <- shiny::reactive({
       shiny::req(input$data)
@@ -365,6 +390,67 @@ minimise_app <- function() {
     )
 
     session$onSessionEnded(shiny::stopApp)
+
+    # Simulate -----------------------------------------------------------------
+
+    output$factorInput <- shiny::renderUI({
+
+      factors <- strsplit(input$simfactors, ", |,")[[1]]
+
+      lapply(factors, function(f) {
+
+        list(shiny::textInput(paste0("levels_", f), paste("Levels of", f)),
+        shiny::textInput(paste0("props_", f), paste("Probabilities of", f)))
+
+      })
+
+    })
+
+    output$simratioInput <- shiny::renderUI({
+      lapply(2:input$groups, function(i) {
+        shiny::numericInput(paste0("simratio", i), NULL, min = 1, value = 1,
+                            step = 1)
+      })
+    })
+
+    simfactors <- shiny::reactive({
+      factors <- strsplit(input$simfactors, ", |,")[[1]]
+      factors.l <- as.list(factors)
+      names(factors.l) <- factors
+      lapply(factors.l, function(f) {
+        levels <- strsplit(input[[paste0("levels_", f)]], ", |,")[[1]]
+        props <- strsplit(input[[paste0("props_", f)]], ", |,")[[1]]
+        return(list(levels = levels, props = props))
+      })
+    })
+
+
+    simdata <- shiny::eventReactive(input$simulate, {
+      simulate_data(input$sampsize, simfactors())
+    })
+
+    simburnin <- shiny::reactive({
+      as.numeric(strsplit(input$simburnin, ", |,")[[1]])
+    })
+
+    simminprob <- shiny::reactive({
+      lapply(strsplit(strsplit(input$simminprob, "\\; |\\;")[[1]], ", |,"),
+             as.numeric)
+    })
+
+    sims <- shiny::eventReactive(input$simulate, {
+
+      ratio <- sapply(1:input$simgroups,
+                      function(i) input[[paste0("simratio", i)]])
+
+      simulate_mini(input$sampsize, simfactors(), Nsims = input$Nsims,
+                    groups = input$simgroups, burnin = simburnin(),
+                    minprob = simminprob(), ratio = ratio)
+    })
+
+    output$temp <- shiny::renderPrint({
+      sims()
+    })
 
   }
 
