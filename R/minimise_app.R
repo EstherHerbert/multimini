@@ -297,7 +297,8 @@ minimise_app <- function() {
         "As .csv" = utils::read.csv(input$new.data$datapath),
         "Input factors" =
           dplyr::bind_rows(sapply(factors(data.mini()),
-                                  function(i) input[[paste0("factor.", i)]]))
+                                  function(i) input[[paste0("factor.", i)]])) %>%
+          dplyr::mutate(dplyr::across(dplyr::everything(), ~ifelse(all(!grepl("\\D", .x)), as.numeric(.x), .x)))
       )
     })
 
