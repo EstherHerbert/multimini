@@ -1,0 +1,16 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: 'multimini: Minimisation For Multi-Arm Trials'
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Esther
+    family-names: Herbert
+    email: e.herbert@sheffield.ac.uk
+    affiliation: University of Sheffield
+repository-code: 'https://github.com/EstherHerbert/multimini'
+license: MIT
