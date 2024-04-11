@@ -61,6 +61,7 @@ simulate_mini <- function(sampsize, factors, Nsims = 100, groups = 3, burnin,
 
   class(out) <- "mini.sim"
   factors(out) <- names(factors)
+  ratio(out) <- ratio
 
   return(out)
 
@@ -90,4 +91,19 @@ print.mini.sim <- function(x, ...) {
   cat(knitr::kable(tab_grp, format = "markdown"), sep = "\n")
   cat("Average imbalance:\n")
   cat(knitr::kable(tab_imb, format = "markdown"), sep = "\n")
+}
+
+#' @export
+plot.mini.sim <- function(x, ...) {
+
+  cbind(x$inputs, x$group.sizes) %>%
+    tidyr::pivot_longer(-c(sim.no, burnin, minprob), names_to = "group",
+                        values_to = "size") %>%
+    ggplot2::ggplot(ggplot2::aes(group, size)) +
+    ggplot2::geom_boxplot() +
+    ggplot2::facet_grid(rows = ggplot2::vars(burnin), cols = ggplot2::vars(minprob)) +
+    ggplot2::labs(x = "Group", y = "Group Size") +
+    ggplot2::theme_bw() +
+    ggplot2::theme(strip.background = ggplot2::element_rect(fill = NA))
+
 }
