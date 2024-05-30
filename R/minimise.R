@@ -167,7 +167,7 @@ print.mini <- function(x, ...){
 #' @param ... other parameters to be passed through to plotting functions.
 #'
 #' @export
-plot.mini <- function(x, show.plots = TRUE, ...) {
+plot.mini <- function(x, show.plot = TRUE, ...) {
 
   plots <- list()
 
@@ -178,8 +178,8 @@ plot.mini <- function(x, show.plots = TRUE, ...) {
 
   ratio <- paste("Allocation ratio:", paste(ratio(x), collapse = ":"))
 
-  plots$factors <-
-    ggplot2::ggplot(out, ggplot2::aes(factors, fill = Group, group = Group)) +
+  plot <- ggplot2::ggplot(out, ggplot2::aes(factors, fill = Group,
+                                            group = Group)) +
     ggplot2::geom_bar(position = "dodge") +
     ggplot2::annotate("label", x = Inf, y = Inf, label = ratio, vjust = 1.5,
                       hjust = 1.5) +
@@ -189,16 +189,10 @@ plot.mini <- function(x, show.plots = TRUE, ...) {
     ggplot2::theme_bw() +
     ggplot2::theme(legend.position = "bottom")
 
-  if(show.plots) {
-    print(plots[[1]])
-    if(length(plots) > 1) {
-      for(i in 2:length(plots)) {
-        invisible(readline("Press [enter] to see next plot:"))
-        print(plots[[i]])
-      }
-    }
+  if(show.plot) {
+    print(plot)
   }
 
-  return(invisible(plots))
+  return(invisible(plot))
 
 }
