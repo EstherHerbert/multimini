@@ -194,7 +194,7 @@ minimise_app <- function() {
     })
 
     output$plot <- shiny::renderPlot({
-      ggpubr::ggarrange(plotlist = plots(), ncol = 1)
+      print(plots())
     })
 
     code <- shiny::eventReactive(input$code, {
@@ -345,7 +345,7 @@ minimise_app <- function() {
     })
 
     output$update_plot <- shiny::renderPlot({
-      ggpubr::ggarrange(plotlist = update_plots(), ncol = 1)
+      print(update_plots())
     })
 
     output$update_download <- shiny::downloadHandler(
