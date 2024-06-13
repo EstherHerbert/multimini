@@ -41,7 +41,7 @@ simulate_mini <- function(sampsize, factors, Nsims = 100, groups = 3, burnin,
                         burnin = burnin,
                         minprob = minprob)
 
-  sims <- mapply(
+  sims <- pbapply::pbmapply(
     function(x, y) {
       data <- simulate_data(sampsize, factors)
       minimise(data = data, groups = groups, factors = names(factors),

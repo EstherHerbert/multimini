@@ -441,6 +441,9 @@ minimise_app <- function() {
 
     sims <- shiny::eventReactive(input$simulate, {
 
+      pbo <- pbapply::pboptions(type = "none")
+      on.exit(pbapply::pboptions(pbo), add = TRUE)
+
       ratio <- sapply(1:input$simgroups,
                       function(i) input[[paste0("simratio", i)]])
 
