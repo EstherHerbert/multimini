@@ -3,6 +3,7 @@
 
 ## usethis namespace: start
 #' @importFrom knitr kable
+#' @importFrom magrittr %>%
 ## usethis namespace: end
 NULL
 

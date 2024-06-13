@@ -425,11 +425,6 @@ minimise_app <- function() {
       })
     })
 
-
-    simdata <- shiny::eventReactive(input$simulate, {
-      simulate_data(input$sampsize, simfactors())
-    })
-
     simburnin <- shiny::reactive({
       as.numeric(strsplit(input$simburnin, ", |,")[[1]])
     })

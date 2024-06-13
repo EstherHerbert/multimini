@@ -14,11 +14,13 @@ Imports:
     ggplot2,
     ggpubr,
     knitr,
+    magrittr,
     pbapply,
     rclipboard,
     rlang,
     rmarkdown,
-    shiny
+    shiny,
+    tidyr
 License: MIT + file LICENSE
 Roxygen: list(markdown = TRUE)
 Suggests: 

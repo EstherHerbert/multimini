@@ -162,8 +162,8 @@ print.mini <- function(x, ...){
 #' Plots to explore minimisation results
 #'
 #' @param x an object of class `mini` as a result of `minimises`
-#' @param show.plots logical; if `FALSE` plots won't be displayed, useful when
-#'                   assigning the plots for future use.
+#' @param show.plot logical; if `FALSE` the plot won't be displayed, useful when
+#'                   assigning the plot for future use.
 #' @param ... other parameters to be passed through to plotting functions.
 #'
 #' @export

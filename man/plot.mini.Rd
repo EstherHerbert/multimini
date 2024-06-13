@@ -4,13 +4,13 @@
 \alias{plot.mini}
 \title{Plots to explore minimisation results}
 \usage{
-\method{plot}{mini}(x, show.plots = TRUE, ...)
+\method{plot}{mini}(x, show.plot = TRUE, ...)
 }
 \arguments{
 \item{x}{an object of class \code{mini} as a result of \code{minimises}}
 
-\item{show.plots}{logical; if \code{FALSE} plots won't be displayed, useful when
-assigning the plots for future use.}
+\item{show.plot}{logical; if \code{FALSE} the plot won't be displayed, useful when
+assigning the plot for future use.}
 
 \item{...}{other parameters to be passed through to plotting functions.}
 }
