@@ -42,24 +42,35 @@ update.mini <- function(object, new.data, ...) {
 
   out <- dplyr::bind_rows(as.data.frame(object), new.data)
 
-  n.factors <- length(factors(object))
-
   if(!is.null(seed(object))) {
     set.seed(seed(object))
   }
 
-  if(is.factor(object$Group)) {
-    groups <- levels(object$Group)
-  } else {
-    groups <- 1:groups(object)
-  }
+  minprob <- minprob(object)
+  groups <- groups(object)
+  factors <- factors(object)
+  ratio <- ratio(object)
+  Rsum <- sum(ratio)
+  Rsum_1 <- Rsum - ratio
+
+  Popt <- rep(minprob, length(groups))
+  for (i in 2:length(groups)) {
+    Popt[i] <- 1 - (1 - minprob) * Rsum_1[i] / Rsum_1[1]
+  }; rm(i)
+
+  Pnon <- matrix(nrow = length(groups), ncol = length(groups))
+  for (i in 1:length(groups)) {
+    for (j in 1:length(groups)) {
+      Pnon[i,j] <- (1 - Popt[j]) * ratio[i]/Rsum_1[j]
+    }
+  }; rm(i,j)
+  diag(Pnon) <- Popt
 
   burnin.remaining <- min(burnin(object) - nrow(object), nrow(new.data))
 
   if(burnin.remaining > 0) {
     out$Group[(nrow(object) + 1):(nrow(object) + burnin.remaining)] <-
-      sample(groups, burnin.remaining, replace = T,
-             prob = ratio(object)/sum(ratio(object)))
+      sample(groups, burnin.remaining, replace = T, prob = ratio/Rsum)
   } else {
     burnin.remaining <- 0
   }
@@ -67,35 +78,62 @@ update.mini <- function(object, new.data, ...) {
   if(any(is.na(out$Group))) {
     for(i in (nrow(object) + burnin.remaining + 1):nrow(out)){
 
-      c_factors <- out[i,] # new participant
-      p_factors <- utils::head(out, i-1) # previous participants
+      c_factors <- out[i,]
+      p_factors <- out[1:(i-1),]
 
-      counts <- matrix(NA, n.factors, groups(object))
-      for (j in 1:n.factors) {
-        for (k in 1:groups(object)) {
-          factor <- factors(object)[j]
-          counts[j,k] <- sum(p_factors[,factor] == c_factors[,factor] &
+      counts <- matrix(NA, length(factors), length(groups),
+                       dimnames = list(factors, groups))
+      for (j in factors) {
+        for (k in groups) {
+          counts[j,k] <- sum(p_factors[,j] == c_factors[,j] &
                                p_factors$Group == k)
         }
       }; rm(j, k)
 
-      scores <- rep(NA, groups(object))
-      for (j in 1:groups(object)) {
-        temp <- counts
-        temp[, j] <- temp[, j] + 1
-        num_level <- temp %*% diag(1/ratio(object))
-        sd_level <- apply(num_level, 1, stats::sd)
-        scores[j] <- sum(sd_level)
+      m <- array(dim = c(2,3,3), dimnames = list(factors, groups, groups))
+
+      for (f in factors) {
+        for (t in groups) {
+          for (s in groups) {
+            if(t == s) {
+              m[f,t,s] <- (counts[f,t] + 1) / ratio[t]
+            } else {
+              m[f,t,s] <- (counts[f,t]) / ratio[t]
+            }
+          }
+        }
+      }; rm(f,t,s)
+
+      M <- matrix(nrow = length(factors), ncol = length(groups),
+                  dimnames = list(factors, groups))
+      for (f in factors) {
+        for (s in groups) {
+          M[f,s] <- sum(m[f,,s])
+        }
+      }; rm(f,s)
+
+      Mean <- M/length(groups)
+
+      SD <- matrix(nrow = length(factors), ncol = length(groups),
+                   dimnames = list(factors, groups))
+      for (f in factors) {
+        for (s in groups) {
+          SD[f,s] <- sqrt((1/length(groups)) * sum((m[f,,s] - Mean[f,s])^2))
+        }
       }
 
+      SD <- apply(SD, 2, sum)
+      J <- (SD == min(SD)) * 1
 
-      if (stats::var(scores) == 0) { # i.e., if they're all equal
-        probs <- rep(1/groups(object), groups(object))
+      if(sum(J) == 1) {
+        P <- Pnon %*% J
+      } else if (sum(J) < length(groups)){
+        P <- (Pnon/sum(J)) %*% J
       } else {
-        probs <- minprob(object)[rank(scores)]
+        P <- ratio/Rsum
       }
 
-      out$Group[i] <- sample(groups, 1, replace = T, prob = probs)
+      out$Group[i] <- sample(groups, 1, prob = P)
 
     }
   }

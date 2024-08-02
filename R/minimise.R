@@ -69,8 +69,6 @@ minimise <- function(data, groups = 3, factors, burnin = 10,
     }
   }
 
-  Tstart <- groups
-
   if(!is.null(group.names)) {
     groups <- group.names
   } else {
@@ -81,14 +79,14 @@ minimise <- function(data, groups = 3, factors, burnin = 10,
   Rsum <- sum(ratio)
   Rsum_1 <- Rsum - ratio
 
-  Popt <- rep(minprob, Tstart)
-  for (i in 2:Tstart) {
+  Popt <- rep(minprob, length(groups))
+  for (i in 2:length(groups)) {
     Popt[i] <- 1 - (1 - minprob) * Rsum_1[i] / Rsum_1[1]
   }; rm(i)
 
-  Pnon <- matrix(nrow = Tstart, ncol = Tstart)
-  for (i in 1:Tstart) {
-    for (j in 1:Tstart) {
+  Pnon <- matrix(nrow = length(groups), ncol = length(groups))
+  for (i in 1:length(groups)) {
+    for (j in 1:length(groups)) {
       Pnon[i,j] <- (1 - Popt[j]) * ratio[i]/Rsum_1[j]
     }
   }; rm(i,j)
@@ -109,7 +107,7 @@ minimise <- function(data, groups = 3, factors, burnin = 10,
     c_factors <- out[i,]
     p_factors <- out[1:(i-1),]
 
-    counts <- matrix(NA, length(factors), Tstart,
+    counts <- matrix(NA, length(factors), length(groups),
                      dimnames = list(factors, groups))
     for (j in factors) {
       for (k in groups) {
@@ -140,13 +138,13 @@ minimise <- function(data, groups = 3, factors, burnin = 10,
       }
     }; rm(f,s)
 
-    Mean <- M/Tstart
+    Mean <- M/length(groups)
 
     SD <- matrix(nrow = length(factors), ncol = length(groups),
                  dimnames = list(factors, groups))
     for (f in factors) {
       for (s in groups) {
-        SD[f,s] <- sqrt((1/Tstart) * sum((m[f,,s] - Mean[f,s])^2))
+        SD[f,s] <- sqrt((1/length(groups)) * sum((m[f,,s] - Mean[f,s])^2))
       }
     }
 
@@ -155,7 +153,7 @@ minimise <- function(data, groups = 3, factors, burnin = 10,
 
     if(sum(J) == 1) {
       P <- Pnon %*% J
-    } else if (sum(J) < Tstart){
+    } else if (sum(J) < length(groups)){
       P <- (Pnon/sum(J)) %*% J
     } else {
       P <- ratio/Rsum
