@@ -7,13 +7,12 @@
 #' @param groups an integer, the number of groups to randomise to, default is 3
 #' @param factors a character vector with the factors for minimisation
 #' @param burnin an integer, the burnin length before minimisation kicks in,
-#'               default is 10. Must be >0 and < total sample size.
-#' @param minprob a vector of the same length as `groups` with the minimisation
-#'                probabilities. The default is to give 0.8 probability to the
-#'                group which would lead to the least imbalance and to allocate
-#'                the remaining probability equally to the other groups.
-#' @param ratio a numeric vector of randomisation ratios (must be of length
-#'              equal to the number of groups)
+#'               default is 10. Must be > 0 and < total sample size.
+#' @param minprob the minimisation probability. The default is to give 0.8
+#'                probability to the group which would lead to the least
+#'                imbalance.
+#' @param ratio a numeric vector of randomisation ratios in ascending order
+#'              (must be of length equal to the number of groups)
 #' @param group.names optional, a character vector with the group names, must be
 #'                    the same length as `groups`.
 #' @param seed optional, an integer that is used with `set.seed()` for
@@ -31,26 +30,22 @@
 #' # View data with group info
 #' as.data.frame(mini)
 #'
-#' # Use 2:1:1 ratio
+#' # Use 1:1:2 ratio
 #' minimise(patients, groups = 3, factors = c("sex", "stage"), burnin = 5,
-#'          ratio = c(2,1,1))
+#'          ratio = c(1,1,2))
 #'
 #' @export
 minimise <- function(data, groups = 3, factors, burnin = 10,
-                     minprob = c(0.8, rep(0.2/(groups - 1), groups - 1)),
-                     ratio = rep(1, groups), group.names = NULL, seed = NULL){
+                     minprob = 0.80, ratio = rep(1, groups), group.names = NULL,
+                     seed = NULL){
 
   # Check inputs
   if(groups < 2) {
     stop("Must be randomising to two or more groups.")
   }
 
-  if(!all(minprob <= 1  & minprob >= 0) | length(minprob) != groups)
-    stop(paste("minprob should be a vector of values between 0-1 (0 <= x <= 1)",
-               "and should be of length equal to the number of groups."))
-
-  if(sum(minprob) != 1)
-    stop("minprob must sum to 1")
+  if(minprob > 1)
+    stop("minprob must be less than or equalto 1")
 
   if(!all(factors %in% names(data)))
     stop("The factors must be variables in the provided data")
@@ -74,57 +69,100 @@ minimise <- function(data, groups = 3, factors, burnin = 10,
     }
   }
 
-  sampsize <- nrow(data)
-  n.factors <- length(factors)
+  Tstart <- groups
 
-  out <- data
+  if(!is.null(group.names)) {
+    groups <- group.names
+  } else {
+    groups <- 1:groups
+  }
 
-  out$Group <- rep(NA, sampsize)
+  names(ratio) <- groups
+  Rsum <- sum(ratio)
+  Rsum_1 <- Rsum - ratio
+
+  Popt <- rep(minprob, Tstart)
+  for (i in 2:Tstart) {
+    Popt[i] <- 1 - (1 - minprob) * Rsum_1[i] / Rsum_1[1]
+  }; rm(i)
+
+  Pnon <- matrix(nrow = Tstart, ncol = Tstart)
+  for (i in 1:Tstart) {
+    for (j in 1:Tstart) {
+      Pnon[i,j] <- (1 - Popt[j]) * ratio[i]/Rsum_1[j]
+    }
+  }; rm(i,j)
+  diag(Pnon) <- Popt
 
   if(!is.null(seed)) {
     set.seed(seed)
   }
 
-  out$Group[1:burnin] <- sample(1:groups, burnin, replace = T,
-                                prob = ratio/sum(ratio))
+  out <- data
 
-  # Minimisation
-  for(i in (burnin + 1):sampsize){
+  out$Group <- NA
 
-    c_factors <- out[i,] # new participant
-    p_factors <- utils::head(out, i-1) # previous participants
+  out$Group[1:burnin] <- sample(groups, burnin, replace = T, prob = ratio/Rsum)
 
-    counts <- matrix(NA, n.factors, groups)
-    for (j in 1:n.factors) {
-      for (k in 1:groups) {
-        factor <- factors[j]
-        counts[j,k] <- sum(p_factors[,factor] == c_factors[,factor] &
+  for (i in (burnin + 1):nrow(data)) {
+
+    c_factors <- out[i,]
+    p_factors <- out[1:(i-1),]
+
+    counts <- matrix(NA, length(factors), Tstart,
+                     dimnames = list(factors, groups))
+    for (j in factors) {
+      for (k in groups) {
+        counts[j,k] <- sum(p_factors[,j] == c_factors[,j] &
                              p_factors$Group == k)
       }
     }; rm(j, k)
 
-    scores <- rep(NA, groups)
-    for (j in 1:groups) {
-      temp <- counts
-      temp[, j] <- temp[, j] + 1
-      num_level <- temp %*% diag(1/ratio)
-      sd_level <- apply(num_level, 1, stats::sd)
-      scores[j] <- sum(sd_level)
+    m <- array(dim = c(2,3,3), dimnames = list(factors, groups, groups))
+
+    for (f in factors) {
+      for (t in groups) {
+        for (s in groups) {
+          if(t == s) {
+            m[f,t,s] <- (counts[f,t] + 1) / ratio[t]
+          } else {
+            m[f,t,s] <- (counts[f,t]) / ratio[t]
+          }
+        }
+      }
+    }; rm(f,t,s)
+
+    M <- matrix(nrow = length(factors), ncol = length(groups),
+                dimnames = list(factors, groups))
+    for (f in factors) {
+      for (s in groups) {
+        M[f,s] <- sum(m[f,,s])
+      }
+    }; rm(f,s)
+
+    Mean <- M/Tstart
+
+    SD <- matrix(nrow = length(factors), ncol = length(groups),
+                 dimnames = list(factors, groups))
+    for (f in factors) {
+      for (s in groups) {
+        SD[f,s] <- sqrt((1/Tstart) * sum((m[f,,s] - Mean[f,s])^2))
+      }
     }
 
+    SD <- apply(SD, 2, sum)
+    J <- (SD == min(SD)) * 1
 
-    if (stats::var(scores) == 0) { # i.e., if they're all equal
-      probs <- rep(1/groups, groups)
+    if(sum(J) == 1) {
+      P <- Pnon %*% J
+    } else if (sum(J) < Tstart){
+      P <- (Pnon/sum(J)) %*% J
     } else {
-      probs <- minprob[rank(scores)]
+      P <- ratio/Rsum
     }
 
-    out$Group[i] <- sample(1:groups, 1, replace = T, prob = probs)
+    out$Group[i] <- sample(groups, 1, prob = P)
 
-  }
-
-  if(!is.null(group.names)) {
-    out$Group <- factor(out$Group, levels = 1:groups, labels = group.names)
   }
 
   class(out) <- c("mini", "data.frame")
@@ -147,12 +185,11 @@ print.mini <- function(x, ...){
   if(!is.null(seed(x))) {
     cat("Seed:", seed(x), "\n")
   }
-  cat("Number of groups:", groups(x), "\n")
+  cat("Groups:", groups(x), "\n")
   cat("Randomisation ratio:", paste(ratio(x), collapse = ":"), "\n")
   cat("Factors:", paste(factors(x), collapse = ", "), "\n")
   cat("Burnin:", burnin(x), "\n")
-  cat("Minimisation probabilities:",
-      paste(round(minprob(x), 2), collapse = ", "), "\n")
+  cat("Minimisation probability:", minprob(x), "\n")
   cat("Group sizes:", paste(table(x$Group), collapse = ", "), "\n")
 
   return(invisible(x))
