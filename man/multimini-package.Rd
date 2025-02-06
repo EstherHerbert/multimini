@@ -10,4 +10,11 @@
 
 Minimisation for multi-arm trials with various methods for the minimisation probabilities.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://estherherbert.github.io/multimini/}
+}
+
+}
 \keyword{internal}
