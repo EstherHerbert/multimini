@@ -64,4 +64,7 @@ as.data.frame(mini)
 minimise(patients, groups = 3, factors = c("sex", "stage"), burnin = 5,
          ratio = c(1,1,2))
 
+# Account for different group eligibility
+minimise(patients, groups = 3, factors = c("sex", "stage"), burnin = 5,
+         ratio = c(1,1,2), check.eligibility = TRUE)
 }

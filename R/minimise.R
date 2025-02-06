@@ -37,6 +37,9 @@
 #' minimise(patients, groups = 3, factors = c("sex", "stage"), burnin = 5,
 #'          ratio = c(1,1,2))
 #'
+#' # Account for different group eligibility
+#' minimise(patients, groups = 3, factors = c("sex", "stage"), burnin = 5,
+#'          ratio = c(1,1,2), check.eligibility = TRUE)
 #' @export
 minimise <- function(data, groups = 3, factors, burnin = 10, minprob = 0.80,
                      ratio = rep(1, groups), group.names = NULL, seed = NULL,
