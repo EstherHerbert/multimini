@@ -130,10 +130,13 @@ update.mini <- function(object, new.data, ...) {
       } else if (sum(J) < length(groups)){
         P <- (Pnon/sum(J)) %*% J
       } else {
-        P <- ratio/Rsum
+        P <- unname(ratio/sum(ratio))
       }
 
-      out$Group[i] <- sample(groups, 1, prob = P)
+      rn <- runif(1)
+      P <- cumsum(P)
+
+      out$Group[i] <- groups[findInterval(rn, P, rightmost.closed = T) + 1]
 
     }
   }
