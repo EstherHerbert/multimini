@@ -34,9 +34,7 @@ devtools::install_github("EstherHerbert/multimini")
 
 ### Using the default minimisation probabilities
 
-This is a basic example which shows you how to solve a common problem:
-
-``` r
+```{r mini}
 library(multimini)
 
 (mini <- minimise(patients, groups = 3, factors = c("sex", "stage"), 
@@ -45,18 +43,18 @@ library(multimini)
 balance(mini)
 ```
 
-### Specifying minimisation probabilities
+### Specifying minimisation probability
 
-``` r
+```{r balance}
 (mini <- minimise(patients, groups = 3, factors = c("sex", "stage"),
-                  burnin = 15, minprob = c(0.8, 0.2, 0)))
+                  burnin = 15, minprob = 0.8))
 
 balance(mini)
 ```
 
 ### Updating the miniisation
 
-``` r
+```{r update}
 new.patients <- data.frame(
  sex = c("F", "F", "M"),
  stage = c("II","I", "I"),
