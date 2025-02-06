@@ -36,7 +36,8 @@
 #'
 #' @export
 minimise <- function(data, groups = 3, factors, burnin = 10, minprob = 0.80,
-                     ratio = rep(1, groups), group.names = NULL, seed = NULL) {
+                     ratio = rep(1, groups), group.names = NULL, seed = NULL,
+                     check.eligibility = FALSE) {
 
   # Check inputs
   if(groups < 2) {
@@ -81,6 +82,13 @@ minimise <- function(data, groups = 3, factors, burnin = 10, minprob = 0.80,
     }
   }
 
+  if (check.eligibility) {
+    if(!"eligible" %in% names(data)) {
+      stop(paste("The data must contain a variable called `eligible` to check",
+                 "eligiblity"))
+    }
+  }
+
   if(!is.null(group.names)) {
     groups <- group.names
   } else {
@@ -110,30 +118,56 @@ minimise <- function(data, groups = 3, factors, burnin = 10, minprob = 0.80,
 
   out <- data
 
+  if (check.eligibility) {
+    out$eligible <- strsplit(out$eligible, "")
+  } else {
+    out$eligible <- list(groups)
+  }
+
   out$Group <- NA
 
-  out$Group[1:burnin] <- sample(groups, burnin, replace = T, prob = ratio/Rsum)
+  for(i in 1:burnin) {
+    I <- groups %in% out$eligible[[i]]
+    out$Group[i] <- sample(groups[I], 1, prob = ratio[I]/sum(ratio[I]))
+  }
 
   for (i in (burnin + 1):nrow(data)) {
 
+    elig <- out$eligible[[i]]
     c_factors <- out[i,]
     p_factors <- out[1:(i-1),]
+    p_factors$Group <- factor(p_factors$Group, levels = groups)
+    p_factors <- p_factors %>%
+      dplyr::filter(purrr::map_lgl(eligible, ~all(elig %in% .x)))
 
-    counts <- matrix(NA, length(factors), length(groups),
-                     dimnames = list(factors, groups))
+    I <- groups %in% elig
+
+    if (sum(I) < length(groups)) {
+      Ptot <- 1/(I %*% Pnon)
+      colnames(Ptot) <- groups
+      Ptot[,!I] <- 0
+
+      P <- Pnon %*% diag(c(Ptot))
+      P <- P[I,I]
+    } else {
+      P <- Pnon
+    }
+
+    counts <- matrix(NA, length(factors), length(groups[I]),
+                     dimnames = list(factors, groups[I]))
     for (j in factors) {
-      for (k in groups) {
+      for (k in groups[I]) {
         counts[j,k] <- sum(p_factors[,j] == c_factors[,j] &
                              p_factors$Group == k)
       }
     }; rm(j, k)
 
-    m <- array(dim = c(length(factors),length(groups),length(groups)),
-               dimnames = list(factors, groups, groups))
+    m <- array(dim = c(length(factors),length(groups[I]),length(groups[I])),
+               dimnames = list(factors, groups[I], groups[I]))
 
     for (f in factors) {
-      for (t in groups) {
-        for (s in groups) {
+      for (t in groups[I]) {
+        for (s in groups[I]) {
           if(t == s) {
             m[f,t,s] <- (counts[f,t] + 1) / ratio[t]
           } else {
@@ -143,21 +177,21 @@ minimise <- function(data, groups = 3, factors, burnin = 10, minprob = 0.80,
       }
     }; rm(f,t,s)
 
-    M <- matrix(nrow = length(factors), ncol = length(groups),
-                dimnames = list(factors, groups))
+    M <- matrix(nrow = length(factors), ncol = length(groups[I]),
+                dimnames = list(factors, groups[I]))
     for (f in factors) {
-      for (s in groups) {
+      for (s in groups[I]) {
         M[f,s] <- sum(m[f,,s])
       }
     }; rm(f,s)
 
-    Mean <- M/length(groups)
+    Mean <- M/length(groups[I])
 
-    SD <- matrix(nrow = length(factors), ncol = length(groups),
-                 dimnames = list(factors, groups))
+    SD <- matrix(nrow = length(factors), ncol = length(groups[I]),
+                 dimnames = list(factors, groups[I]))
     for (f in factors) {
-      for (s in groups) {
-        SD[f,s] <- sqrt((1/length(groups)) * sum((m[f,,s] - Mean[f,s])^2))
+      for (s in groups[I]) {
+        SD[f,s] <- sqrt((1/length(groups[I])) * sum((m[f,,s] - Mean[f,s])^2))
       }
     }
 
@@ -165,17 +199,17 @@ minimise <- function(data, groups = 3, factors, burnin = 10, minprob = 0.80,
     J <- (SD == min(SD)) * 1
 
     if(sum(J) == 1) {
-      P <- Pnon %*% J
-    } else if (sum(J) < length(groups)){
-      P <- (Pnon/sum(J)) %*% J
+      P <- P %*% J
+    } else if (sum(J) < length(groups[I])){
+      P <- (P/sum(J)) %*% J
     } else {
-      P <- unname(ratio/sum(ratio))
+      P <- unname(ratio[I]/sum(ratio[I]))
     }
 
     rn <- stats::runif(1)
     P <- cumsum(P)
 
-    out$Group[i] <- groups[findInterval(rn, P, rightmost.closed = T) + 1]
+    out$Group[i] <- groups[I][findInterval(rn, P, rightmost.closed = T) + 1]
 
   }
 
