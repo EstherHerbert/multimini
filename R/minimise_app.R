@@ -26,9 +26,8 @@ minimise_app <- function() {
                                multiple = T),
             shiny::numericInput("burnin", "Length of burnin period", min = 1,
                                 value = 10),
-            shiny::numericInput("minprob1", "Minimisation probabilities", min = 0,
+            shiny::numericInput("minprob", "Minimisation probability", min = 0,
                                 max = 1, value = 0.8, step = 0.1),
-            shiny::uiOutput("minprobInput"),
             shiny::numericInput("ratio1", "Ratios", min = 1, value = 1,
                                 step = 1),
             shiny::uiOutput("ratioInput"),
@@ -138,13 +137,6 @@ minimise_app <- function() {
       shiny::updateNumericInput(session, "burnin", max = nrow(data()))
     })
 
-    output$minprobInput <- shiny::renderUI({
-      lapply(2:input$groups, function(i) {
-        shiny::numericInput(paste0("minprob", i), NULL, min = 0, max = 1,
-                            value = 0.2/(input$groups - 1), step = 0.1)
-      })
-    })
-
     output$ratioInput <- shiny::renderUI({
       lapply(2:input$groups, function(i) {
         shiny::numericInput(paste0("ratio", i), NULL, min = 1, value = 1,
@@ -159,15 +151,13 @@ minimise_app <- function() {
     })
 
     mini <- shiny::eventReactive(input$minimise, {
-      shiny::req(input$minprob1); shiny::req(input$factors)
+      shiny::req(input$minprob); shiny::req(input$factors)
       if(input$names) {
         names <- sapply(1:input$groups,
                         function(i) input[[paste0("name", i)]])
       } else {
         names <- NULL
       }
-      minprob <- sapply(1:input$groups,
-                        function(i) input[[paste0("minprob", i)]])
       ratio <- sapply(1:input$groups, function(i) input[[paste0("ratio", i)]])
 
       if(input$seed) {
@@ -177,7 +167,7 @@ minimise_app <- function() {
       }
 
       minimise(data(), groups = input$groups, factors = input$factors,
-               burnin = input$burnin, minprob = minprob, ratio = ratio,
+               burnin = input$burnin, minprob = input$minprob, ratio = ratio,
                group.names = names, seed = seed.n)
     })
 
@@ -207,9 +197,6 @@ minimise_app <- function() {
         names <- "NULL"
       }
 
-      minprob <- sapply(1:input$groups, function(i) input[[paste0("minprob", i)]])
-      minprob <- paste(minprob, collapse = ", ")
-
       ratio <- sapply(1:input$groups, function(i) input[[paste0("ratio", i)]])
       ratio <- paste(ratio, collapse = ", ")
 
@@ -231,7 +218,7 @@ minimise_app <- function() {
         "groups = ", input$groups, ", ",
         "factors = c(", paste0("\"", input$factors, "\"", collapse = ", "), "), ",
         "burnin = ", input$burnin, ", ",
-        "minprob = c(", minprob, "), ",
+        "minprob = ", input$minprob, ", ",
         "ratio = c(", ratio, ")",
         ifelse(input$names, paste0(", group.names = ", names), ""),
         ifelse(input$seed, paste0(", seed = ", seed.n), ""),
@@ -430,8 +417,7 @@ minimise_app <- function() {
     })
 
     simminprob <- shiny::reactive({
-      lapply(strsplit(strsplit(input$simminprob, "\\; |\\;")[[1]], ", |,"),
-             as.numeric)
+      as.numeric(strsplit(input$simminprob, ", |,")[[1]])
     })
 
     sims <- shiny::eventReactive(input$simulate, {
