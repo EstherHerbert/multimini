@@ -417,8 +417,7 @@ minimise_app <- function() {
     })
 
     simminprob <- shiny::reactive({
-      lapply(strsplit(strsplit(input$simminprob, "\\; |\\;")[[1]], ", |,"),
-             as.numeric)
+      as.numeric(strsplit(input$simminprob, ", |,")[[1]])
     })
 
     sims <- shiny::eventReactive(input$simulate, {

@@ -18,8 +18,7 @@
 #' @param burnin a vector of integers of possible burnin lengths before
 #'               minimisation kicks in. Individual values must be > 0 and
 #'               < total sample size.
-#' @param minprob a list of vectors (each of the same length as `groups`) with
-#'                the possible minimisation probabilities.
+#' @param minprob a vector of the possible minimisation probabilities.
 #' @param ratio a numeric vector of randomisation ratios (must be of length
 #'              equal to the number of groups).
 #'
@@ -30,8 +29,7 @@
 #'                              site = list(levels = 12,
 #'                                          prop.dist = c(mean = 0.1, sd = 0.05))),
 #'               Nsims = 10, groups = 3, burnin = c(10, 15),
-#'               minprob = list(c(0.8, 0.1, 0.1), c(0.8, 0.15, 0.05)),
-#'               ratio = c(1,1,1))
+#'               minprob = c(0.7, 0.8, 0.9), ratio = c(1,1,1))
 #'
 #' @export
 simulate_mini <- function(sampsize, factors, Nsims = 100, groups = 3, burnin,
@@ -53,8 +51,6 @@ simulate_mini <- function(sampsize, factors, Nsims = 100, groups = 3, burnin,
 
   imbalance <- mapply(function(x) balance(x)$imbalance, sims)
   group.sizes <- t(sapply(sims, function(x) with(x, table(Group))))
-
-  inputs$minprob <- sapply(inputs$minprob, paste, collapse = ", ")
 
   out <- list(inputs = inputs, simulations = sims, group.sizes = group.sizes,
               imbalance = imbalance)
@@ -86,7 +82,7 @@ print.mini.sim <- function(x, ...) {
   cat("Factors:", paste(factors(x), collapse = ", "), "\n")
   cat("Burnin options:", paste(unique(x$inputs$burnin), collapse = ", "), "\n")
   cat("Minimisation probability options:",
-      paste(unique(x$inputs$minprob), ncollapse = "; "), "\n")
+      paste(unique(x$inputs$minprob), collapse = ", "), "\n")
   cat("Average group sizes:\n")
   cat(knitr::kable(tab_grp, format = "markdown"), sep = "\n")
   cat("Average imbalance:\n")
