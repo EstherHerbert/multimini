@@ -53,6 +53,19 @@ minimise <- function(data, groups = 3, factors, burnin = 10, minprob = 0.80,
     stop("ratio should have length equal to the number of groups.")
   }
 
+  if(is.unsorted(ratio)) {
+    ask <- utils::askYesNo(
+      msg = paste("ratio should be in ascending order, would you like to",
+                  "automatically sort the vector?"),
+      prompts = "Y/N/c"
+    )
+    if (!is.na(ask) && ask) {
+      ratio <- sort(ratio)
+    } else {
+      stop("ratio should be given in ascending order", call. = F)
+    }
+  }
+
   if(burnin == 0) {
     warning("Burnin must be greater than 0, it has been updated to 1.")
     burnin <- 1
