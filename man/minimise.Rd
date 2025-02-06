@@ -9,7 +9,7 @@ minimise(
   groups = 3,
   factors,
   burnin = 10,
-  minprob = c(0.8, rep(0.2/(groups - 1), groups - 1)),
+  minprob = 0.8,
   ratio = rep(1, groups),
   group.names = NULL,
   seed = NULL
@@ -24,15 +24,14 @@ for the minimisation factors.}
 \item{factors}{a character vector with the factors for minimisation}
 
 \item{burnin}{an integer, the burnin length before minimisation kicks in,
-default is 10. Must be >0 and < total sample size.}
+default is 10. Must be > 0 and < total sample size.}
 
-\item{minprob}{a vector of the same length as \code{groups} with the minimisation
-probabilities. The default is to give 0.8 probability to the
-group which would lead to the least imbalance and to allocate
-the remaining probability equally to the other groups.}
+\item{minprob}{the minimisation probability. The default is to give 0.8
+probability to the group which would lead to the least
+imbalance.}
 
-\item{ratio}{a numeric vector of randomisation ratios (must be of length
-equal to the number of groups)}
+\item{ratio}{a numeric vector of randomisation ratios in ascending order
+(must be of length equal to the number of groups)}
 
 \item{group.names}{optional, a character vector with the group names, must be
 the same length as \code{groups}.}
@@ -56,8 +55,8 @@ indicating numerically which group has been allocated.
 # View data with group info
 as.data.frame(mini)
 
-# Use 2:1:1 ratio
+# Use 1:1:2 ratio
 minimise(patients, groups = 3, factors = c("sex", "stage"), burnin = 5,
-         ratio = c(2,1,1))
+         ratio = c(1,1,2))
 
 }
