@@ -133,7 +133,7 @@ update.mini <- function(object, new.data, ...) {
         P <- unname(ratio/sum(ratio))
       }
 
-      rn <- runif(1)
+      rn <- stats::runif(1)
       P <- cumsum(P)
 
       out$Group[i] <- groups[findInterval(rn, P, rightmost.closed = T) + 1]

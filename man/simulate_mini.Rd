@@ -33,8 +33,7 @@ default is 100.}
 minimisation kicks in. Individual values must be > 0 and
 < total sample size.}
 
-\item{minprob}{a list of vectors (each of the same length as \code{groups}) with
-the possible minimisation probabilities.}
+\item{minprob}{a vector of the possible minimisation probabilities.}
 
 \item{ratio}{a numeric vector of randomisation ratios (must be of length
 equal to the number of groups).}
@@ -52,7 +51,6 @@ simulate_mini(sampsize = 150,
                              site = list(levels = 12,
                                          prop.dist = c(mean = 0.1, sd = 0.05))),
               Nsims = 10, groups = 3, burnin = c(10, 15),
-              minprob = list(c(0.8, 0.1, 0.1), c(0.8, 0.15, 0.05)),
-              ratio = c(1,1,1))
+              minprob = c(0.7, 0.8, 0.9), ratio = c(1,1,1))
 
 }
