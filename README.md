@@ -34,23 +34,23 @@ library(multimini)
                   burnin = 15))
 #> Multi-arm Minimisation 
 #> --------------------------------------------------------------------------------
-#> Groups: 1 2 3 
+#> Groups: A B C 
 #> Randomisation ratio: 1:1:1 
 #> Factors: sex, stage 
 #> Burnin: 15 
 #> Minimisation probability: 0.8 
-#> Group sizes: 50, 52, 48
+#> Group sizes: 50, 50, 50
 
 balance(mini)
-#> Balance of factors (sex, stage) over 123 groups (1:1:1)
+#> Balance of factors (sex, stage) over ABC groups (1:1:1)
 #> --------------------------------------------------------------------------------
-#> |  F|  M|    |  I| II| III|
-#> |--:|--:|    |--:|--:|---:|
-#> | 23| 27|    | 25| 16|   9|
-#> | 25| 27|    | 27| 15|  10|
-#> | 22| 26|    | 25| 15|   8|
+#> |   |  F|  M|    |   |  I| II| III|
+#> |:--|--:|--:|    |:--|--:|--:|---:|
+#> |A  | 24| 26|    |A  | 26| 15|   9|
+#> |B  | 23| 27|    |B  | 26| 15|   9|
+#> |C  | 23| 27|    |C  | 25| 16|   9|
 #> 
-#> Total imbalance: 4.837
+#> Total imbalance: 2.309
 ```
 
 ### Specifying minimisation probability
@@ -60,23 +60,23 @@ balance(mini)
                   burnin = 15, minprob = 0.8))
 #> Multi-arm Minimisation 
 #> --------------------------------------------------------------------------------
-#> Groups: 1 2 3 
+#> Groups: A B C 
 #> Randomisation ratio: 1:1:1 
 #> Factors: sex, stage 
 #> Burnin: 15 
 #> Minimisation probability: 0.8 
-#> Group sizes: 50, 49, 51
+#> Group sizes: 51, 50, 49
 
 balance(mini)
-#> Balance of factors (sex, stage) over 123 groups (1:1:1)
+#> Balance of factors (sex, stage) over ABC groups (1:1:1)
 #> --------------------------------------------------------------------------------
-#> |  F|  M|    |  I| II| III|
-#> |--:|--:|    |--:|--:|---:|
-#> | 22| 28|    | 25| 15|  10|
-#> | 23| 26|    | 25| 15|   9|
-#> | 25| 26|    | 27| 16|   8|
+#> |   |  F|  M|    |   |  I| II| III|
+#> |:--|--:|--:|    |:--|--:|--:|---:|
+#> |A  | 24| 27|    |A  | 26| 16|   9|
+#> |B  | 23| 27|    |B  | 26| 15|   9|
+#> |C  | 23| 26|    |C  | 25| 15|   9|
 #> 
-#> Total imbalance: 5.414
+#> Total imbalance: 2.309
 ```
 
 ### Updating the miniisation
@@ -91,10 +91,10 @@ new.patients <- data.frame(
 update(mini, new.patients) 
 #> Multi-arm Minimisation 
 #> --------------------------------------------------------------------------------
-#> Groups: 1 2 3 
+#> Groups: A B C 
 #> Randomisation ratio: 1:1:1 
 #> Factors: sex, stage 
 #> Burnin: 15 
 #> Minimisation probability: 0.8 
-#> Group sizes: 51, 50, 52
+#> Group sizes: 53, 50, 50
 ```

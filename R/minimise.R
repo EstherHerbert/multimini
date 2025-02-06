@@ -35,9 +35,8 @@
 #'          ratio = c(1,1,2))
 #'
 #' @export
-minimise <- function(data, groups = 3, factors, burnin = 10,
-                     minprob = 0.80, ratio = rep(1, groups), group.names = NULL,
-                     seed = NULL){
+minimise <- function(data, groups = 3, factors, burnin = 10, minprob = 0.80,
+                     ratio = rep(1, groups), group.names = NULL, seed = NULL) {
 
   # Check inputs
   if(groups < 2) {
@@ -72,7 +71,7 @@ minimise <- function(data, groups = 3, factors, burnin = 10,
   if(!is.null(group.names)) {
     groups <- group.names
   } else {
-    groups <- 1:groups
+    groups <- LETTERS[1:groups]
   }
 
   names(ratio) <- groups
