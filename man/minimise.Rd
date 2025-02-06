@@ -12,7 +12,8 @@ minimise(
   minprob = 0.8,
   ratio = rep(1, groups),
   group.names = NULL,
-  seed = NULL
+  seed = NULL,
+  check.eligibility = FALSE
 )
 }
 \arguments{
@@ -38,6 +39,10 @@ the same length as \code{groups}.}
 
 \item{seed}{optional, an integer that is used with \code{set.seed()} for
 offsetting the random number generator.}
+
+\item{check.eligibility}{logical indicating whether participants have varying
+eligibility for different groups. If \code{TRUE} then the
+column \code{eligible} should exist in the data.}
 }
 \value{
 (Invisibly) the data.frame with an additional column \code{Group}

@@ -17,6 +17,9 @@
 #'                    the same length as `groups`.
 #' @param seed optional, an integer that is used with `set.seed()` for
 #'             offsetting the random number generator.
+#' @param check.eligibility logical indicating whether participants have varying
+#'                          eligibility for different groups. If `TRUE` then the
+#'                          column `eligible` should exist in the data.
 #'
 #' @returns (Invisibly) the data.frame with an additional column `Group`
 #'   indicating numerically which group has been allocated.

@@ -16,6 +16,7 @@ Imports:
     knitr,
     magrittr,
     pbapply,
+    purrr,
     rclipboard,
     rlang,
     rmarkdown,
