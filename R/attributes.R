@@ -51,3 +51,12 @@ seed <- function(x) {
   attr(x, "seed") <- value
   return(x)
 }
+
+eligibility <- function(x) {
+  return(attr(x, "eligibility"))
+}
+
+`eligibility<-` <- function(x, value) {
+  attr(x, "eligibility") <- value
+  return(x)
+}

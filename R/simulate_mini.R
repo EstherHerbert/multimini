@@ -12,6 +12,8 @@
 #'   levels. The second item is either `props`, a vector of proportions equal to
 #'   the number of levels in the factor; OR prop.dist which is a named vector
 #'   containing the mean and sd of the proportions.
+#' @param eligibility logical, should the data include group eligibility.
+#'   If `TRUE` then must supply `groups` argument.
 #' @param Nsims an integer, the number of simulations to run per scenario,
 #'              default is 100.
 #' @param groups an integer, the number of groups to randomise, default is 3.
@@ -32,8 +34,8 @@
 #'               minprob = c(0.7, 0.8, 0.9), ratio = c(1,1,1))
 #'
 #' @export
-simulate_mini <- function(sampsize, factors, Nsims = 100, groups = 3, burnin,
-                          minprob, ratio = rep(1, groups)) {
+simulate_mini <- function(sampsize, factors, eligibility = FALSE, Nsims = 100,
+                          groups = 3, burnin, minprob, ratio = rep(1, groups)) {
 
   inputs <- expand.grid(sim.no = 1:Nsims,
                         burnin = burnin,
@@ -41,9 +43,10 @@ simulate_mini <- function(sampsize, factors, Nsims = 100, groups = 3, burnin,
 
   sims <- pbapply::pbmapply(
     function(x, y) {
-      data <- simulate_data(sampsize, factors)
+      data <- simulate_data(sampsize, factors, eligibility, groups)
       minimise(data = data, groups = groups, factors = names(factors),
-               burnin = x, minprob = y, ratio = ratio)
+               burnin = x, minprob = y, ratio = ratio,
+               check.eligibility = eligibility)
     },
     inputs$burnin, inputs$minprob,
     SIMPLIFY = FALSE
@@ -58,6 +61,7 @@ simulate_mini <- function(sampsize, factors, Nsims = 100, groups = 3, burnin,
   class(out) <- "mini.sim"
   factors(out) <- names(factors)
   ratio(out) <- ratio
+  eligibility(out) <- eligibility
 
   return(out)
 
@@ -80,6 +84,10 @@ print.mini.sim <- function(x, ...) {
   cat(rep("-", 80), "\n", sep = "")
   cat("Number of simulations per scenario:", max(x$inputs$sim.no), "\n")
   cat("Factors:", paste(factors(x), collapse = ", "), "\n")
+  cat("Allocation ratio:", paste(ratio(x), collapse = ", "), "\n")
+  if(eligibility(x)) {
+    cat("Eligibiliyt for arms was checked\n")
+  }
   cat("Burnin options:", paste(unique(x$inputs$burnin), collapse = ", "), "\n")
   cat("Minimisation probability options:",
       paste(unique(x$inputs$minprob), collapse = ", "), "\n")

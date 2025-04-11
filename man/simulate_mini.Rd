@@ -7,6 +7,7 @@
 simulate_mini(
   sampsize,
   factors,
+  eligibility = FALSE,
   Nsims = 100,
   groups = 3,
   burnin,
@@ -23,6 +24,9 @@ is \code{levels} which is either a vector of the level names OR the number of
 levels. The second item is either \code{props}, a vector of proportions equal to
 the number of levels in the factor; OR prop.dist which is a named vector
 containing the mean and sd of the proportions.}
+
+\item{eligibility}{logical, should the data include group eligibility.
+If \code{TRUE} then must supply \code{groups} argument.}
 
 \item{Nsims}{an integer, the number of simulations to run per scenario,
 default is 100.}

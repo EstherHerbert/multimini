@@ -226,6 +226,7 @@ minimise <- function(data, groups = 3, factors, burnin = 10, minprob = 0.80,
   minprob(out) <- minprob
   ratio(out) <- ratio
   seed(out) <- seed
+  eligibility(out) <- check.eligibility
 
   return(out)
 
