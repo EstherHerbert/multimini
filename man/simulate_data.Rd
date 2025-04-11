@@ -4,7 +4,7 @@
 \alias{simulate_data}
 \title{Simulate data for minimisation simulations}
 \usage{
-simulate_data(sampsize, factors)
+simulate_data(sampsize, factors, eligibility = FALSE, groups = NULL)
 }
 \arguments{
 \item{sampsize}{the desired sample size of the data, i.e., the sample size
@@ -15,6 +15,12 @@ is \code{levels} which is either a vector of the level names OR the number of
 levels. The second item is either \code{props}, a vector of proportions equal to
 the number of levels in the factor; OR prop.dist which is a named vector
 containing the mean and sd of the proportions.}
+
+\item{eligibility}{logical, should the data include group eligibility.
+If \code{TRUE} then must supply \code{groups} argument.}
+
+\item{groups}{either a character vector of group names or an integer
+specifying the number of groups.}
 }
 \description{
 Given a list of factors with specified levels and proportions, and a sample
@@ -26,5 +32,11 @@ simulate_data(factors = list(sex = list(levels = c("M", "F"),
                              site = list(levels = 12,
                                          prop.dist = c(mean = 0.1, sd = 0.05))),
               sampsize = 150)
+
+simulate_data(factors = list(sex = list(levels = c("M", "F"),
+                                        props = c(0.5, 0.5)),
+                             site = list(levels = 12,
+                                         prop.dist = c(mean = 0.1, sd = 0.05))),
+              sampsize = 100, eligibility = TRUE, groups = 4)
 
 }
