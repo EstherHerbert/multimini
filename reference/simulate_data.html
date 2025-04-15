@@ -39,7 +39,7 @@ size, this function simulates data for use in <code><a href="simulate_mini.html"
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">simulate_data</span><span class="op">(</span><span class="va">sampsize</span>, <span class="va">factors</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">simulate_data</span><span class="op">(</span><span class="va">sampsize</span>, <span class="va">factors</span>, eligibility <span class="op">=</span> <span class="cn">FALSE</span>, groups <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -58,6 +58,16 @@ levels. The second item is either <code>props</code>, a vector of proportions eq
 the number of levels in the factor; OR prop.dist which is a named vector
 containing the mean and sd of the proportions.</p></dd>
 
+
+<dt id="arg-eligibility">eligibility<a class="anchor" aria-label="anchor" href="#arg-eligibility"></a></dt>
+<dd><p>logical, should the data include group eligibility.
+If <code>TRUE</code> then must supply <code>groups</code> argument.</p></dd>
+
+
+<dt id="arg-groups">groups<a class="anchor" aria-label="anchor" href="#arg-groups"></a></dt>
+<dd><p>either a character vector of group names or an integer
+specifying the number of groups.</p></dd>
+
 </dl></div>
 
     <div class="section level2">
@@ -67,157 +77,114 @@ containing the mean and sd of the proportions.</p></dd>
 <span class="r-in"><span>                             site <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>levels <span class="op">=</span> <span class="fl">12</span>,</span></span>
 <span class="r-in"><span>                                         prop.dist <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>mean <span class="op">=</span> <span class="fl">0.1</span>, sd <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>              sampsize <span class="op">=</span> <span class="fl">150</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      ID sex site</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1     1   M   12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2     2   M    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3     3   M    2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4     4   F    5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5     5   F   10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6     6   F   10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7     7   M    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8     8   F   12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9     9   F    4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10   10   F    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11   11   M    5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12   12   F   12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13   13   F    4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14   14   M    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15   15   M    9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 16   16   F    4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 17   17   F   12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 18   18   M    6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 19   19   M   11</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 20   20   F    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 21   21   F    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 22   22   M    5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 23   23   F    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 24   24   M    6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 25   25   M    9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 26   26   F    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 27   27   M    4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 28   28   M    6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 29   29   F    5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 30   30   F    8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 31   31   F    8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 32   32   M    8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 33   33   M    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 34   34   F    5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 35   35   M    2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 36   36   F    4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 37   37   M   10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 38   38   F    9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 39   39   F    4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 40   40   M   10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 41   41   M    2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 42   42   M    5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 43   43   M    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 44   44   M   12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 45   45   F    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 46   46   M   12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 47   47   M   12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 48   48   F    6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 49   49   M    8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 50   50   F    7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 51   51   F   10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 52   52   F   12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 53   53   F   11</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 54   54   M   10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 55   55   F   12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 56   56   M    6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 57   57   F    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 58   58   F   10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 59   59   M    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 60   60   M    5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 61   61   F    7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 62   62   F    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 63   63   M   12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 64   64   F   12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 65   65   F   10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 66   66   F    4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 67   67   F   12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 68   68   M    2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 69   69   M    5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 70   70   F    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 71   71   M    6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 72   72   M    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 73   73   F   12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 74   74   F    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 75   75   F    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 76   76   F    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 77   77   F    7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 78   78   F    6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 79   79   F    9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 80   80   F   12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 81   81   F    9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 82   82   M   10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 83   83   M   10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 84   84   M   12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 85   85   F    7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 86   86   F    6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 87   87   F    6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 88   88   M    8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 89   89   M    6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 90   90   M    8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 91   91   M   10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 92   92   F    6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 93   93   F    8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 94   94   M    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 95   95   F    5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 96   96   M   10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 97   97   M    7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 98   98   F    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 99   99   M   12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 100 100   F   12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 101 101   M    8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 102 102   M    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 103 103   M    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 104 104   M    5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 105 105   M    6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 106 106   M    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 107 107   M    2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 108 108   M    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 109 109   F   10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 110 110   F    7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 111 111   M    4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 112 112   F    5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 113 113   F    6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 114 114   M    4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 115 115   M    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 116 116   F   12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 117 117   M    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 118 118   M    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 119 119   M   10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 120 120   M    9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 121 121   M    2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 122 122   F    6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 123 123   F    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 124 124   F    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 125 125   M   10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 126 126   M    4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 127 127   M   12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 128 128   M    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 129 129   F    2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 130 130   F    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 131 131   F    4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 132 132   M    8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 133 133   F   10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 134 134   M    4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 135 135   F   12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 136 136   F    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 137 137   M   12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 138 138   M    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 139 139   M    4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 140 140   M    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 141 141   F   12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 142 142   M    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 143 143   F   12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 144 144   F    3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 145 145   M    8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 146 146   M    6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 147 147   M    6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 148 148   F   10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 149 149   M    4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 150 150   F    7</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in sample.int(length(x), size, replace, prob):</span> invalid first argument</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">simulate_data</span><span class="op">(</span>factors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>sex <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M"</span>, <span class="st">"F"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                                        props <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                             site <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>levels <span class="op">=</span> <span class="fl">12</span>,</span></span>
+<span class="r-in"><span>                                         prop.dist <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>mean <span class="op">=</span> <span class="fl">0.1</span>, sd <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>              sampsize <span class="op">=</span> <span class="fl">100</span>, eligibility <span class="op">=</span> <span class="cn">TRUE</span>, groups <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      ID sex site eligible</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     1   M    5       CD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     2   M    7      ACD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3     3   F    6       AC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4     4   F   10       CD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5     5   F    8      ABD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6     6   F   11       BD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7     7   F    5       AD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8     8   M   12      BCD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9     9   F    5     ABCD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10   10   F    8      ACD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11   11   F    5      ABC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12   12   F    1       BD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13   13   M   10      ABD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14   14   M    2      BCD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15   15   M   11       BC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16   16   M    9      ABC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17   17   F    1     ABCD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18   18   M    9       BC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19   19   F   10      BCD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20   20   M    8       CD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21   21   F    3       AB</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22   22   M    1       CD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23   23   F   10       CD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24   24   M   12     ABCD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 25   25   F    5       AC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 26   26   F    3       CD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 27   27   F    6      ABD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 28   28   M    9     ABCD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 29   29   F    2       CD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 30   30   F   12       AD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 31   31   F    4      ABC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 32   32   M   12      ABD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 33   33   M   12      ABC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 34   34   M    8       BD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 35   35   F    9       CD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 36   36   M    8       BC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 37   37   F    5       BC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 38   38   F    8      ACD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 39   39   M   12       BC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 40   40   F    8     ABCD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 41   41   M    5     ABCD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 42   42   F    6      ACD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 43   43   M   11      ACD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 44   44   F   10      ABD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 45   45   M   10     ABCD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 46   46   M    6       BC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 47   47   F   10      ABD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 48   48   F    4       AC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 49   49   M    5      ABC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 50   50   F    5       BD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 51   51   M    5       BC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 52   52   F    8      ABC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 53   53   M    5       BC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 54   54   F    6      ABC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 55   55   F    4       AB</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 56   56   M    9       AB</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 57   57   M    1      ABD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 58   58   M   11     ABCD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 59   59   F    1       AD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 60   60   F    3      BCD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 61   61   F    5      ACD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 62   62   M    6       AD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 63   63   F    6      ABC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 64   64   M    8      ABC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 65   65   F   11       BD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 66   66   M    4       CD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 67   67   F    4      ABD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 68   68   M   12      ABC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 69   69   F    5       CD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 70   70   F    8      BCD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 71   71   M   10      ABD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 72   72   M    4       AC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 73   73   F   12       AC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 74   74   F   12       BD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 75   75   M    8       BD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 76   76   M    4      BCD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 77   77   F    4       AD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 78   78   F    1       BD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 79   79   M    8     ABCD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 80   80   M    1     ABCD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 81   81   M    5       AC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 82   82   F    5       BC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 83   83   M    5      ACD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 84   84   F    1     ABCD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 85   85   F    5      ACD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 86   86   F    8       BC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 87   87   F   10       BC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 88   88   M   11      ABD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 89   89   M   11       AD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 90   90   M    2       BD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 91   91   M    5      ABC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 92   92   F   11       BD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 93   93   M    8      BCD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 94   94   F    5       CD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 95   95   M    5      ABC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 96   96   M    2     ABCD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 97   97   F    5      BCD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 98   98   M    4      BCD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 99   99   M    3       AD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 100 100   M    2       BC</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
