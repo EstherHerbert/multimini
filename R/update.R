@@ -90,7 +90,8 @@ update.mini <- function(object, new.data, ...) {
         }
       }; rm(j, k)
 
-      m <- array(dim = c(2,3,3), dimnames = list(factors, groups, groups))
+      m <- array(dim = c(length(factors),length(groups),length(groups)),
+                 dimnames = list(factors, groups, groups))
 
       for (f in factors) {
         for (t in groups) {
