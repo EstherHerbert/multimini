@@ -35,6 +35,10 @@ simulate_data <- function(sampsize, factors, eligibility = FALSE, groups = NULL)
     stop("Must supply `groups` if `eligibility = TRUE`")
   }
 
+   data <- lapply(factors, gen_factor, sampsize = sampsize)
+
+  data <- data.frame(ID = 1:sampsize, data)
+
   if (eligibility) {
     if (length(groups) == 1 & rlang::is_integerish(groups)) {
       groups <- LETTERS[1:groups]
@@ -44,15 +48,10 @@ simulate_data <- function(sampsize, factors, eligibility = FALSE, groups = NULL)
       temp <- c(temp, utils::combn(groups, i, simplify = F))
     }
     groups <- sapply(temp, paste, collapse = "")
+    data$eligible <- sample(groups, sampsize, replace = T)
   }
 
-  data <- lapply(factors, gen_factor, sampsize = sampsize)
-
-  data <- data.frame(ID = 1:sampsize, data)
-
-  data$eligible <- sample(groups, sampsize, replace = T)
-
-  return(data)
+    return(data)
 
 }
 
