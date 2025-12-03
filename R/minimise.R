@@ -3,26 +3,27 @@
 #' `minimise` randomises patients in a data frame using minimisation
 #'
 #' @param data a `data.frame` object with one line per participant and columns
-#'             for the minimisation factors.
+#'   for the minimisation factors. It is also possible to pass an empty
+#'   `data.frame` in order to set up minimisation for later use through
+#'   `update.mini()`.
 #' @param groups an integer, the number of groups to randomise to, default is 3
 #' @param factors a character vector with the factors for minimisation
 #' @param burnin an integer, the burnin length before minimisation kicks in,
-#'               default is 10. Must be > 0 and < total sample size.
+#'   default is 10. Must be > 0.
 #' @param minprob the minimisation probability. The default is to give 0.8
-#'                probability to the group which would lead to the least
-#'                imbalance.
+#'   probability to the group which would lead to the least imbalance.
 #' @param ratio a numeric vector of randomisation ratios in ascending order
-#'              (must be of length equal to the number of groups)
+#'   (must be of length equal to the number of groups)
 #' @param group.names optional, a character vector with the group names, must be
-#'                    the same length as `groups`.
+#'   the same length as `groups`.
 #' @param seed optional, an integer that is used with `set.seed()` for
-#'             offsetting the random number generator.
+#'   offsetting the random number generator.
 #' @param check.eligibility logical indicating whether participants have varying
-#'                          eligibility for different groups. If `TRUE` then the
-#'                          column `eligible` should exist in the data.
+#'  eligibility for different groups. If `TRUE` then the column `eligible`
+#'  should exist in the data.
 #'
 #' @returns (Invisibly) the data.frame with an additional column `Group`
-#'   indicating numerically which group has been allocated.
+#'   indicating which group has been allocated.
 #'
 #' @examples
 #' # Minimisation to 3 groups, with two factors and a burnin of 15, using the
@@ -78,10 +79,6 @@ minimise <- function(data, groups = 3, factors, burnin = 10, minprob = 0.80,
     burnin <- 1
   }
 
-  if(burnin >= nrow(data)) {
-    stop("Specified burnin must be less than the sample size")
-  }
-
   if(!is.null(group.names)) {
     if(length(group.names) != groups) {
       stop("group.names should have length equal to the number of groups.")
@@ -124,99 +121,110 @@ minimise <- function(data, groups = 3, factors, burnin = 10, minprob = 0.80,
 
   out <- data
 
-  if (check.eligibility) {
-    out$eligible <- strsplit(out$eligible, "")
-  } else {
-    out$eligible <- list(groups)
-  }
+  if (nrow(out) > 0) {
 
-  out$Group <- NA
-
-  for(i in 1:burnin) {
-    I <- groups %in% out$eligible[[i]]
-    out$Group[i] <- sample(groups[I], 1, prob = ratio[I]/sum(ratio[I]))
-  }
-
-  for (i in (burnin + 1):nrow(data)) {
-
-    elig <- out$eligible[[i]]
-    c_factors <- out[i,]
-    p_factors <- out[1:(i-1),]
-    p_factors$Group <- factor(p_factors$Group, levels = groups)
-    p_factors <- p_factors %>%
-      dplyr::filter(purrr::map_lgl(eligible, ~all(elig %in% .x)))
-
-    I <- groups %in% elig
-
-    if (sum(I) < length(groups)) {
-      Ptot <- 1/(I %*% Pnon)
-      colnames(Ptot) <- groups
-      Ptot[,!I] <- 0
-
-      P <- Pnon %*% diag(c(Ptot))
-      P <- P[I,I]
+    if (check.eligibility) {
+      out$eligible <- strsplit(out$eligible, "")
     } else {
-      P <- Pnon
+      out$eligible <- list(groups)
     }
 
-    counts <- matrix(NA, length(factors), length(groups[I]),
+    out$Group <- NA
+
+    if (nrow(out) < burnin) {
+      burnin.n <- nrow(out)
+    } else {
+      burnin.n <- burnin
+    }
+
+    for(i in 1:burnin.n) {
+      I <- groups %in% out$eligible[[i]]
+      out$Group[i] <- sample(groups[I], 1, prob = ratio[I]/sum(ratio[I]))
+    }
+
+    if (nrow(out) > burnin) {
+      for (i in (burnin.n + 1):nrow(data)) {
+
+        elig <- out$eligible[[i]]
+        c_factors <- out[i,]
+        p_factors <- out[1:(i-1),]
+        p_factors$Group <- factor(p_factors$Group, levels = groups)
+        p_factors <- p_factors %>%
+          dplyr::filter(purrr::map_lgl(eligible, ~all(elig %in% .x)))
+
+        I <- groups %in% elig
+
+        if (sum(I) < length(groups)) {
+          Ptot <- 1/(I %*% Pnon)
+          colnames(Ptot) <- groups
+          Ptot[,!I] <- 0
+
+          P <- Pnon %*% diag(c(Ptot))
+          P <- P[I,I]
+        } else {
+          P <- Pnon
+        }
+
+        counts <- matrix(NA, length(factors), length(groups[I]),
+                         dimnames = list(factors, groups[I]))
+        for (j in factors) {
+          for (k in groups[I]) {
+            counts[j,k] <- sum(p_factors[,j] == c_factors[,j] &
+                                 p_factors$Group == k)
+          }
+        }; rm(j, k)
+
+        m <- array(dim = c(length(factors),length(groups[I]),length(groups[I])),
+                   dimnames = list(factors, groups[I], groups[I]))
+
+        for (f in factors) {
+          for (t in groups[I]) {
+            for (s in groups[I]) {
+              if(t == s) {
+                m[f,t,s] <- (counts[f,t] + 1) / ratio[t]
+              } else {
+                m[f,t,s] <- (counts[f,t]) / ratio[t]
+              }
+            }
+          }
+        }; rm(f,t,s)
+
+        M <- matrix(nrow = length(factors), ncol = length(groups[I]),
+                    dimnames = list(factors, groups[I]))
+        for (f in factors) {
+          for (s in groups[I]) {
+            M[f,s] <- sum(m[f,,s])
+          }
+        }; rm(f,s)
+
+        Mean <- M/length(groups[I])
+
+        SD <- matrix(nrow = length(factors), ncol = length(groups[I]),
                      dimnames = list(factors, groups[I]))
-    for (j in factors) {
-      for (k in groups[I]) {
-        counts[j,k] <- sum(p_factors[,j] == c_factors[,j] &
-                             p_factors$Group == k)
-      }
-    }; rm(j, k)
-
-    m <- array(dim = c(length(factors),length(groups[I]),length(groups[I])),
-               dimnames = list(factors, groups[I], groups[I]))
-
-    for (f in factors) {
-      for (t in groups[I]) {
-        for (s in groups[I]) {
-          if(t == s) {
-            m[f,t,s] <- (counts[f,t] + 1) / ratio[t]
-          } else {
-            m[f,t,s] <- (counts[f,t]) / ratio[t]
+        for (f in factors) {
+          for (s in groups[I]) {
+            SD[f,s] <- sqrt((1/length(groups[I])) * sum((m[f,,s] - Mean[f,s])^2))
           }
         }
-      }
-    }; rm(f,t,s)
 
-    M <- matrix(nrow = length(factors), ncol = length(groups[I]),
-                dimnames = list(factors, groups[I]))
-    for (f in factors) {
-      for (s in groups[I]) {
-        M[f,s] <- sum(m[f,,s])
-      }
-    }; rm(f,s)
+        SD <- apply(SD, 2, sum)
+        J <- (SD == min(SD)) * 1
 
-    Mean <- M/length(groups[I])
+        if(sum(J) == 1) {
+          P <- P %*% J
+        } else if (sum(J) < length(groups[I])){
+          P <- (P/sum(J)) %*% J
+        } else {
+          P <- unname(ratio[I]/sum(ratio[I]))
+        }
 
-    SD <- matrix(nrow = length(factors), ncol = length(groups[I]),
-                 dimnames = list(factors, groups[I]))
-    for (f in factors) {
-      for (s in groups[I]) {
-        SD[f,s] <- sqrt((1/length(groups[I])) * sum((m[f,,s] - Mean[f,s])^2))
+        rn <- stats::runif(1)
+        P <- cumsum(P)
+
+        out$Group[i] <- groups[I][findInterval(rn, P, rightmost.closed = T) + 1]
+
       }
     }
-
-    SD <- apply(SD, 2, sum)
-    J <- (SD == min(SD)) * 1
-
-    if(sum(J) == 1) {
-      P <- P %*% J
-    } else if (sum(J) < length(groups[I])){
-      P <- (P/sum(J)) %*% J
-    } else {
-      P <- unname(ratio[I]/sum(ratio[I]))
-    }
-
-    rn <- stats::runif(1)
-    P <- cumsum(P)
-
-    out$Group[i] <- groups[I][findInterval(rn, P, rightmost.closed = T) + 1]
-
   }
 
   class(out) <- c("mini", "data.frame")
@@ -253,13 +261,18 @@ print.mini <- function(x, ...){
 
 #' Plots to explore minimisation results
 #'
-#' @param x an object of class `mini` as a result of `minimises`
+#' @param x an object of class `mini` as a result of `minimises` with
+#'   `nrow(x) > 0`.
 #' @param show.plot logical; if `FALSE` the plot won't be displayed, useful when
-#'                   assigning the plot for future use.
+#'   assigning the plot for future use.
 #' @param ... other parameters to be passed through to plotting functions.
 #'
 #' @export
 plot.mini <- function(x, show.plot = TRUE, ...) {
+
+  if (nrow(x) == 0) {
+    stop("This is an empty minimisation setup.", call. = F)
+  }
 
   plots <- list()
 

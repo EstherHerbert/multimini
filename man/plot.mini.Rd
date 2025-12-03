@@ -7,7 +7,8 @@
 \method{plot}{mini}(x, show.plot = TRUE, ...)
 }
 \arguments{
-\item{x}{an object of class \code{mini} as a result of \code{minimises}}
+\item{x}{an object of class \code{mini} as a result of \code{minimises} with
+\code{nrow(x) > 0}.}
 
 \item{show.plot}{logical; if \code{FALSE} the plot won't be displayed, useful when
 assigning the plot for future use.}

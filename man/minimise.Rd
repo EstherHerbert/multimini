@@ -18,18 +18,19 @@ minimise(
 }
 \arguments{
 \item{data}{a \code{data.frame} object with one line per participant and columns
-for the minimisation factors.}
+for the minimisation factors. It is also possible to pass an empty
+\code{data.frame} in order to set up minimisation for later use through
+\code{update.mini()}.}
 
 \item{groups}{an integer, the number of groups to randomise to, default is 3}
 
 \item{factors}{a character vector with the factors for minimisation}
 
 \item{burnin}{an integer, the burnin length before minimisation kicks in,
-default is 10. Must be > 0 and < total sample size.}
+default is 10. Must be > 0.}
 
 \item{minprob}{the minimisation probability. The default is to give 0.8
-probability to the group which would lead to the least
-imbalance.}
+probability to the group which would lead to the least imbalance.}
 
 \item{ratio}{a numeric vector of randomisation ratios in ascending order
 (must be of length equal to the number of groups)}
@@ -41,12 +42,12 @@ the same length as \code{groups}.}
 offsetting the random number generator.}
 
 \item{check.eligibility}{logical indicating whether participants have varying
-eligibility for different groups. If \code{TRUE} then the
-column \code{eligible} should exist in the data.}
+eligibility for different groups. If \code{TRUE} then the column \code{eligible}
+should exist in the data.}
 }
 \value{
 (Invisibly) the data.frame with an additional column \code{Group}
-indicating numerically which group has been allocated.
+indicating which group has been allocated.
 }
 \description{
 \code{minimise} randomises patients in a data frame using minimisation
