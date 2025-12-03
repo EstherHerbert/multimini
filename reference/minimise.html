@@ -55,7 +55,9 @@
 
 <dl><dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
 <dd><p>a <code>data.frame</code> object with one line per participant and columns
-for the minimisation factors.</p></dd>
+for the minimisation factors. It is also possible to pass an empty
+<code>data.frame</code> in order to set up minimisation for later use through
+<code><a href="update.mini.html">update.mini()</a></code>.</p></dd>
 
 
 <dt id="arg-groups">groups<a class="anchor" aria-label="anchor" href="#arg-groups"></a></dt>
@@ -68,13 +70,12 @@ for the minimisation factors.</p></dd>
 
 <dt id="arg-burnin">burnin<a class="anchor" aria-label="anchor" href="#arg-burnin"></a></dt>
 <dd><p>an integer, the burnin length before minimisation kicks in,
-default is 10. Must be &gt; 0 and &lt; total sample size.</p></dd>
+default is 10. Must be &gt; 0.</p></dd>
 
 
 <dt id="arg-minprob">minprob<a class="anchor" aria-label="anchor" href="#arg-minprob"></a></dt>
 <dd><p>the minimisation probability. The default is to give 0.8
-probability to the group which would lead to the least
-imbalance.</p></dd>
+probability to the group which would lead to the least imbalance.</p></dd>
 
 
 <dt id="arg-ratio">ratio<a class="anchor" aria-label="anchor" href="#arg-ratio"></a></dt>
@@ -94,14 +95,14 @@ offsetting the random number generator.</p></dd>
 
 <dt id="arg-check-eligibility">check.eligibility<a class="anchor" aria-label="anchor" href="#arg-check-eligibility"></a></dt>
 <dd><p>logical indicating whether participants have varying
-eligibility for different groups. If <code>TRUE</code> then the
-column <code>eligible</code> should exist in the data.</p></dd>
+eligibility for different groups. If <code>TRUE</code> then the column <code>eligible</code>
+should exist in the data.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>(Invisibly) the data.frame with an additional column <code>Group</code>
-indicating numerically which group has been allocated.</p>
+indicating which group has been allocated.</p>
     </div>
 
     <div class="section level2">
@@ -307,7 +308,7 @@ indicating numerically which group has been allocated.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>
